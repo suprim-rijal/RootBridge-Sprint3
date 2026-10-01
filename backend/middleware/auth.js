@@ -1,18 +1,33 @@
-/*
-FILE: backend/middleware/auth.js
-OWNER: Member 1 - Accounts and security
+const User = require("../models/User");
+const AppError = require("../utils/AppError");
+const asyncHandler = require("../utils/asyncHandler");
+const { verifyToken } = require("../utils/token");
 
-WHAT THIS FILE DOES
-Two gatekeepers: one proves who you are, one checks what you may do.
+const protect = asyncHandler(async (req, _res, next) => {
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
+  if (!token) throw new AppError("Please log in first.", 401);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+  const payload = verifyToken(token); // JWT errors are turned into 401s by errorHandler
+  const user = await User.findById(payload.sub);
+  if (!user)
+    throw new AppError(
+      "This account no longer exists. Please log in again.",
+      401,
+    );
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+  req.user = user;
+  next();
+});
+
+function requireRole(...roles) {
+  return (req, _res, next) => {
+    if (!req.user) return next(new AppError("Please log in first.", 401));
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError("Your account type cannot use this.", 403));
+    }
+    next();
+  };
+}
+
+module.exports = { protect, requireRole };
