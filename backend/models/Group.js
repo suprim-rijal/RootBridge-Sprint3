@@ -1,18 +1,38 @@
-/*
-FILE: backend/models/Group.js
-OWNER: Member 3 - Classes and teachers
+// =====================================================================
+// Group — a teacher's class. Learners join with its 6-digit code.
+// (Called "Group" in the code, "class" on screen: "class" is a reserved
+// word in JavaScript.)
+// =====================================================================
+const mongoose = require("mongoose");
 
-WHAT THIS FILE DOES
-A teacher's class. Called Group in code because 'class' is a reserved word in JavaScript.
+const groupSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: [true, "Give the class a name."], trim: true, maxlength: 80 },
+    teacher: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    code: { type: String, required: true, unique: true, match: /^\d{6}$/ },
+    language: { type: String, enum: ["nepali", "finnish", "japanese", "twi"], default: "nepali" },
+    meets: { type: String, default: "", trim: true, maxlength: 80 }, // e.g. "Saturdays, 10:00"
+    liveClassUrl: { type: String, default: "" }, // Zoom / Teams / Meet link
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    // Listed in the class directory, so learners can find it and ask to
+    // join without knowing the code.
+    discoverable: { type: Boolean, default: false, index: true },
+    about: { type: String, default: "", trim: true, maxlength: 300 },
+  },
+  { timestamps: true },
+);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+// A random 6-digit code that no other class uses.
+// Learners ask "which classes am I in?" on every dashboard load.
+groupSchema.index({ members: 1 });
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+groupSchema.statics.newCode = async function newCode() {
+  for (let i = 0; i < 20; i += 1) {
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    // eslint-disable-next-line no-await-in-loop -- one check at a time
+    if (!(await this.exists({ code }))) return code;
+  }
+  throw new Error("Could not find a free class code. Please try again.");
+};
+
+module.exports = mongoose.model("Group", groupSchema);

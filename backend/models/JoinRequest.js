@@ -1,18 +1,26 @@
-/*
-FILE: backend/models/JoinRequest.js
-OWNER: Member 3 - Classes and teachers
+// =====================================================================
+// A learner asking a teacher to join their class.
+// ---------------------------------------------------------------------
+// Before this, a learner could only join if they already knew the 6-digit
+// code, which they had no way of getting. Now a teacher can list a class
+// in the directory, and learners ask to join with a short message.
+// =====================================================================
+const mongoose = require("mongoose");
 
-WHAT THIS FILE DOES
-A learner asking a teacher to let them into a class.
+const joinRequestSchema = new mongoose.Schema(
+  {
+    group: { type: mongoose.Schema.Types.ObjectId, ref: "Group", required: true, index: true },
+    learner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    // A few words from the learner: who they are, what they want to learn.
+    message: { type: String, default: "", maxlength: 500 },
+    status: { type: String, enum: ["pending", "approved", "declined"], default: "pending" },
+    // An optional reply from the teacher when declining.
+    teacherNote: { type: String, default: "", maxlength: 300 },
+  },
+  { timestamps: true },
+);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+// One live request per learner per class.
+joinRequestSchema.index({ group: 1, learner: 1 }, { unique: true });
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = mongoose.model("JoinRequest", joinRequestSchema);
