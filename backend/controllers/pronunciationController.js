@@ -1,18 +1,31 @@
-/*
-FILE: backend/controllers/pronunciationController.js
-OWNER: Member 2 - Learning experience
+// POST /api/pronunciation/grade
+// body: { language, targetNative, targetRomanization, targetMeaning,
+//         transcripts: [{ text, confidence }], attemptNumber }
+const AppError = require("../utils/AppError");
+const asyncHandler = require("../utils/asyncHandler");
+const { grade, LANGUAGE_NAMES } = require("../services/pronunciation");
 
-WHAT THIS FILE DOES
-Grading a spoken attempt. The controller validates; the service decides.
+const gradePronunciation = asyncHandler(async (req, res) => {
+  const { language = "nepali", targetNative, targetRomanization = "", targetMeaning = "", transcripts, attemptNumber = 1 } =
+    req.body || {};
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+  if (!LANGUAGE_NAMES[language]) throw new AppError("Unknown language.", 400);
+  if (!targetNative || typeof targetNative !== "string") throw new AppError("Send the targetNative word.", 400);
+  if (!Array.isArray(transcripts)) throw new AppError("transcripts must be a list.", 400);
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+  const clean = transcripts
+    .slice(0, 5)
+    .map((t) => ({ text: String(t?.text ?? "").slice(0, 200), confidence: Math.max(0, Math.min(1, Number(t?.confidence) || 0)) }));
+
+  const data = await grade({
+    language,
+    targetNative: targetNative.slice(0, 120),
+    targetRomanization: String(targetRomanization).slice(0, 120),
+    targetMeaning: String(targetMeaning).slice(0, 120),
+    transcripts: clean,
+    attemptNumber: Math.max(1, Math.min(20, Number(attemptNumber) || 1)),
+  });
+  res.json({ success: true, data });
+});
+
+module.exports = { gradePronunciation };
