@@ -1,18 +1,15 @@
-/*
-FILE: backend/routes/progressRoutes.js
-OWNER: Member 5 - Quality, docs and deployment
+// Progress routes. Mounted at /api/progress. Learners only.
+const express = require("express");
+const { getMine, patchMine, loseLife, earnLife } = require("../controllers/progressController");
+const { protect, requireRole } = require("../middleware/auth");
+const { LEARNER_ROLES } = require("../config/roles");
 
-WHAT THIS FILE DOES
-Progress and hearts, learners only.
+const router = express.Router();
+router.use(protect, requireRole(...LEARNER_ROLES));
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+router.get("/me", getMine);
+router.patch("/me", patchMine);
+router.post("/lives/lose", loseLife);
+router.post("/lives/earn", earnLife);
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = router;
