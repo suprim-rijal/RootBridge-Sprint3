@@ -1,3 +1,15 @@
+// =====================================================================
+// User roles
+// ---------------------------------------------------------------------
+// Chosen from the role menu on the login and signup pages.
+//   CHILD_PARENT  one family account: child view (learning + Cultural
+//                 Passport) and parent view (administrative)
+//   NORMAL        independent learner: learning + standard profile
+//   TEACHER       teacher workspace
+// Sprint 3: the Admin role was removed.
+// Values match backend/config/roles.js.
+// =====================================================================
+
 export const ROLES = Object.freeze({
   CHILD_PARENT: "CombinedChildParent",
   NORMAL: "NormalUser",
@@ -11,9 +23,7 @@ export const ROLE_OPTIONS = Object.freeze([
   { value: ROLES.TEACHER, label: "Teacher" },
 ]);
 
-export const ROLE_LABELS = Object.freeze(
-  Object.fromEntries(ROLE_OPTIONS.map((o) => [o.value, o.label])),
-);
+export const ROLE_LABELS = Object.freeze(Object.fromEntries(ROLE_OPTIONS.map((o) => [o.value, o.label])));
 
 // Roles that use the dashboard and the learning paths.
 export const LEARNER_ROLES = Object.freeze([ROLES.CHILD_PARENT, ROLES.NORMAL]);
@@ -23,8 +33,7 @@ export const VIEWS = Object.freeze({ CHILD: "child", PARENT: "parent" });
 
 // Home page for a role (and, for families, for the current view).
 export function homeFor(role, view = VIEWS.CHILD) {
-  if (role === ROLES.CHILD_PARENT)
-    return view === VIEWS.PARENT ? "/parent" : "/dashboard";
+  if (role === ROLES.CHILD_PARENT) return view === VIEWS.PARENT ? "/parent" : "/dashboard";
   if (role === ROLES.NORMAL) return "/dashboard";
   if (role === ROLES.TEACHER) return "/teacher";
   return "/";

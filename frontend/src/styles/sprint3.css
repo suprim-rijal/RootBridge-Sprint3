@@ -1,0 +1,678 @@
+/* =====================================================================
+   Sprint 3 additions: hearts, new exercise styles, "Explain more",
+   out-of-hearts screen. Kept in their own file so the Sprint 2 theme
+   files (index.css, App.css, flow.css) stay unchanged. Only theme
+   colour variables are used, so everything matches.
+   ===================================================================== */
+
+/* ---- hearts in the lesson bar ---- */
+.ln-hearts {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+}
+.ln-hearts .full {
+  color: var(--terracotta);
+  fill: var(--terracotta);
+}
+.ln-hearts .empty {
+  color: var(--line);
+}
+
+/* ---- cloze: the sentence with its gap ---- */
+.ln-sentence {
+  display: grid;
+  gap: 6px;
+  font-size: clamp(22px, 4vw, 30px);
+  text-align: center;
+  margin-top: 12px;
+}
+.ln-sentence .ln-muted {
+  font-size: 15px;
+}
+
+/* ---- sentence order: word chips ---- */
+.ln-order {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+.ln-order-line,
+.ln-order-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 56px;
+  align-items: center;
+}
+.ln-order-line {
+  padding: 10px;
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--line);
+  background: var(--paper);
+}
+.ln-chip {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 19px;
+  cursor: pointer;
+}
+.ln-chip small {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.ln-chip:hover:not(:disabled) {
+  border-color: var(--indigo);
+}
+.ln-chip:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.ln-chip.placed {
+  border-color: var(--indigo);
+  background: var(--indigo-soft);
+}
+.ln-chip.placed:disabled {
+  opacity: 1;
+}
+.ln-order > .btn {
+  justify-self: start;
+}
+
+/* ---- "Use a hint?" confirmation ---- */
+.ln-confirm {
+  margin-top: 14px;
+}
+.ln-confirm p {
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+/* ---- Explain more ---- */
+.ln-explain {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--indigo-soft);
+}
+.ln-explain summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--indigo-deep, var(--indigo));
+}
+.ln-explain p {
+  margin: 8px 0 0;
+}
+.ln-breakdown {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 10px 0 0;
+}
+.ln-breakdown li {
+  display: grid;
+  justify-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  font-size: 17px;
+}
+.ln-breakdown small {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+/* ---- out of hearts ---- */
+.ln-out-of-lives {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+  margin-top: 16px;
+}
+.ln-out-of-lives > svg {
+  color: var(--terracotta);
+}
+.ln-out-options {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+  text-align: left;
+}
+.ln-out-option {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--paper);
+}
+.ln-out-option p {
+  margin: 4px 0 10px;
+}
+
+/* ---- rewards on the finish screen ---- */
+.ln-reward {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink-soft);
+}
+.ln-reward.ok {
+  background: var(--green-soft);
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* ---- pronunciation coach (Step 4) ---- */
+.ln-coach {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--line);
+  background: var(--bg);
+}
+.ln-coach p {
+  margin: 6px 0 0;
+}
+.ln-coach.spot_on {
+  border-left-color: var(--green);
+  background: var(--green-soft);
+}
+.ln-coach.close {
+  border-left-color: var(--gold);
+  background: var(--gold-soft);
+}
+.ln-coach.needs_work,
+.ln-coach.unclear {
+  border-left-color: var(--terracotta);
+  background: var(--terracotta-soft);
+}
+.ln-coach-cheer {
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+/* ---- Language Hub (Step 5) ---- */
+.hub {
+  width: min(960px, 100% - 32px);
+  margin: 24px auto 60px;
+  display: grid;
+  gap: 12px;
+}
+.hub-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--terracotta);
+  font-weight: 700;
+  font-size: 14px;
+}
+.hub-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 40px);
+  margin: 0;
+}
+.hub-sub {
+  margin: 0 0 8px;
+  color: var(--ink-soft);
+}
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+.hub-card {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  text-align: left;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.hub-card:hover {
+  border-color: var(--indigo);
+}
+.hub-card.selected {
+  border-color: var(--indigo);
+  background: var(--indigo-soft);
+}
+.hub-native {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.1;
+}
+.hub-name {
+  font-weight: 700;
+}
+.hub-name small {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.hub-tracks {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.hub-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--indigo);
+  color: #fff;
+}
+.hub-soon {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+.hub-continue {
+  justify-self: start;
+  margin-top: 8px;
+}
+
+/* ---- Teacher workspace and classes (Step 6) ---- */
+.t-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.t-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.t-code {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--indigo);
+}
+.t-code.big {
+  font-size: 30px;
+}
+.t-code-box {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+}
+.t-code-box small {
+  color: var(--ink-soft);
+}
+.t-class-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+.t-class-card {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  text-decoration: none;
+}
+.t-class-card:hover {
+  border-color: var(--indigo);
+}
+.t-class-card small {
+  color: var(--ink-soft);
+}
+.t-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--green) !important;
+}
+.t-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  display: grid;
+  gap: 8px;
+}
+.t-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+.t-list li > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.t-list small {
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+.t-list p {
+  margin: 4px 0 0;
+}
+.t-list li.done {
+  background: var(--green-soft);
+}
+.ic-done {
+  color: var(--green);
+  vertical-align: -2px;
+}
+.t-row-actions {
+  display: flex;
+  gap: 10px;
+}
+.t-account {
+  display: block;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.t-kind {
+  display: flex;
+  gap: 16px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.t-kind label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.class-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.class-card h2 {
+  margin: 0;
+}
+.class-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 8px;
+  font-size: 16px;
+}
+.classes-page .join-class {
+  margin-bottom: 16px;
+}
+
+/* Live class banner on the dashboard */
+.live-banner {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--green-soft);
+  border: 1.5px solid var(--green);
+}
+.live-banner-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.live-banner-row span {
+  flex: 1;
+  min-width: 160px;
+}
+.live-banner-more {
+  justify-self: start;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+/* Tables scroll sideways inside their own box on phones. The box must be
+   the positioning reference too, or a screen-reader-only label inside
+   the table (position: absolute) would stretch the whole page. */
+.pd-table-wrap {
+  position: relative;
+  overflow-x: auto;
+  /* Inside a grid, a child stretches to its content unless told otherwise,
+     so a wide table would still push the page sideways on a phone. */
+  min-width: 0;
+}
+.pd-panel,
+.pd-main,
+.acct {
+  min-width: 0;
+}
+
+/* ---- crash screen (ErrorBoundary) ---- */
+.crash-screen {
+  max-width: 520px;
+  margin: 80px auto;
+  padding: 28px;
+  text-align: center;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+}
+.crash-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* Hearts in the top bar, on every page */
+.nav-hearts {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ---- Pair Up ---- */
+.ln-pairs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.ln-pair-col {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.ln-pair {
+  width: 100%;
+  display: grid;
+  gap: 2px;
+  padding: 14px 12px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 19px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.ln-pair.meaning {
+  font-size: 16px;
+}
+.ln-pair small {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.ln-pair:hover:not(:disabled) {
+  border-color: var(--indigo);
+}
+.ln-pair.picked {
+  border-color: var(--indigo);
+  background: var(--indigo-soft);
+}
+.ln-pair.matched {
+  border-color: var(--green);
+  background: var(--green-soft);
+  opacity: 1;
+  cursor: default;
+}
+.ln-pair.wrong {
+  border-color: var(--terracotta);
+  background: var(--terracotta-soft);
+}
+
+/* ---- True or False ---- */
+.ln-statement {
+  margin-top: 12px;
+  font-size: clamp(20px, 3.4vw, 26px);
+  text-align: center;
+  line-height: 1.4;
+}
+
+@media (max-width: 560px) {
+  .ln-pairs {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- parent unlock page ---- */
+.unlock {
+  max-width: 460px;
+  margin: 60px auto;
+  padding: 28px;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+}
+.unlock > svg {
+  color: var(--indigo);
+}
+.unlock h1 {
+  margin: 0;
+}
+.unlock-form {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+.unlock-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ---- "set a PIN" card in the parent view ---- */
+.pin-setup {
+  border: 2px solid var(--indigo);
+  background: var(--indigo-soft);
+}
+.pin-setup-form .pin-input {
+  max-width: 140px;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+/* ---- find a class / requests ---- */
+.find-class h3 {
+  margin: 18px 0 8px;
+  font-size: 15px;
+}
+.find-filter {
+  max-width: 240px;
+}
+.find-ask {
+  margin-top: 10px;
+}
+.t-check {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 8px;
+}
+.t-check input {
+  margin-top: 3px;
+}
+.t-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--terracotta);
+  color: #fff;
+  font-size: 13px;
+}
+
+/* ---- forgot the PIN ---- */
+.forgot-pin-link {
+  margin-top: 4px;
+}
+.forgot-pin {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  text-align: left;
+}
+.forgot-pin p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}

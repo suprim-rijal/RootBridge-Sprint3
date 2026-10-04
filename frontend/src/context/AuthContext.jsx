@@ -1,18 +1,24 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+// =====================================================================
+// AuthContext: the logged-in user, shared by every page.
+// ---------------------------------------------------------------------
+// How it works:
+//   1. <AuthProvider> wraps the whole app (see App.jsx).
+//   2. Any component calls useAuth() to read `user` or call an action.
+//   3. Every action calls the backend (services/api.js), then saves the
+//      returned user in React state AND in localStorage, so a refresh
+//      shows the page at once.
+//   4. On every page load the saved token is checked with
+//      GET /api/auth/me, so the user always comes from the server, not
+//      from a stale copy in the browser.
+//
+// Sprint 3: the backend is real (MongoDB + JWT). The token is stored in
+// localStorage under "rootbridge_token" (see README, known limits).
+// =====================================================================
+
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as api from "../services/api.js";
 import { tokenStore } from "../services/http.js";
-import {
-  cancelProgressSync,
-  notifyProgressChanged,
-  pullProgress,
-} from "../lib/progress.js";
+import { cancelProgressSync, notifyProgressChanged, pullProgress } from "../lib/progress.js";
 import { setActiveLanguage } from "../data/curriculum.js";
 import { homeFor, LEARNER_ROLES, ROLES, VIEWS } from "../config/roles.js";
 
@@ -44,12 +50,12 @@ export function nextStepFor(user, view = VIEWS.CHILD) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(loadSession);
-  // true right after "Log out" in this tab. RequireAuth then sends the visitor home instead of remembering the page they were on (which would send the NEXT person who logs in to the previous user's page).
+  // true right after "Log out" in this tab. RequireAuth then sends the
+  // visitor home instead of remembering the page they were on (which
+  // would send the NEXT person who logs in to the previous user's page).
   const [signedOut, setSignedOut] = useState(false);
   const [view, setViewState] = useState(() =>
-    localStorage.getItem(VIEW_KEY) === VIEWS.PARENT
-      ? VIEWS.PARENT
-      : VIEWS.CHILD,
+    localStorage.getItem(VIEW_KEY) === VIEWS.PARENT ? VIEWS.PARENT : VIEWS.CHILD,
   );
 
   // Save the user in state + localStorage.
@@ -61,6 +67,7 @@ export function AuthProvider({ children }) {
     notifyProgressChanged(); // progress is stored per user
   }, []);
 
+  // ----- on page load: ask the server who the token belongs to -----
   // Only a failed /auth/me ends the session. Other 401s (a wrong PIN,
   // a wrong password on a form) must never log anyone out.
   useEffect(() => {
@@ -124,6 +131,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(VIEW_KEY);
   }, [saveSession]);
 
+  // ----- profile -----
   // Replace one or more "details" sections, e.g. updateDetails({ avatar })
   const updateDetails = useCallback(
     async (patch) => {
@@ -143,29 +151,23 @@ export function AuthProvider({ children }) {
     [user, saveSession],
   );
 
-  // Called at the end of the welcome animation. Updates the onboarding status.
+  // Called at the end of the welcome animation.
   const completeWelcome = useCallback(
-    () =>
-      updateDetails({
-        onboarding: { ...user.details.onboarding, completed: true },
-      }),
+    () => updateDetails({ onboarding: { ...user.details.onboarding, completed: true } }),
     [user, updateDetails],
   );
 
   const setLanguage = useCallback(
-    (language) =>
-      updateDetails({ onboarding: { ...user.details.onboarding, language } }),
+    (language) => updateDetails({ onboarding: { ...user.details.onboarding, language } }),
     [user, updateDetails],
   );
 
   const updateParentSettings = useCallback(
-    (settings) =>
-      updateDetails({
-        parentSettings: { ...user.details.parentSettings, ...settings },
-      }),
+    (settings) => updateDetails({ parentSettings: { ...user.details.parentSettings, ...settings } }),
     [user, updateDetails],
   );
 
+  // ----- classes -----
   const joinClass = useCallback(
     async (code) => {
       const res = await api.joinClass({ userId: user.id, code });
@@ -182,15 +184,16 @@ export function AuthProvider({ children }) {
     },
     [user, saveSession],
   );
-  // Parent settings only limit Child/Parent accounts.
+
+  // ----- values derived from the user -----
   const isFamily = user?.role === ROLES.CHILD_PARENT;
   const isLearner = Boolean(user && LEARNER_ROLES.includes(user.role));
   const activeView = isFamily ? view : VIEWS.CHILD;
   // The learner's language decides which curriculum every page shows.
+  // Set during render (cheap, idempotent), so the first paint is right.
   setActiveLanguage(user?.details.onboarding.language || "nepali");
 
-  const settings =
-    user?.details.parentSettings ?? api.DEFAULT_DETAILS.parentSettings;
+  const settings = user?.details.parentSettings ?? api.DEFAULT_DETAILS.parentSettings;
   // Checked on the server (POST /api/users/verify-pin), never in the browser.
   const verifyPin = api.verifyPin;
   // Forgotten PIN: check the account password, then set or remove it.
@@ -202,16 +205,12 @@ export function AuthProvider({ children }) {
     },
     [saveSession],
   );
-  // Name to greet the learner with.
+  // Parent settings only limit Child/Parent accounts.
   const learningRules = isFamily
-    ? {
-        allowedTracks: settings.allowedTracks,
-        allowSpeaking: settings.allowSpeaking,
-      }
+    ? { allowedTracks: settings.allowedTracks, allowSpeaking: settings.allowSpeaking }
     : { allowedTracks: { language: true, culture: true }, allowSpeaking: true };
-  const learnerName = isFamily
-    ? settings.childName || "Explorer"
-    : (user?.name.split(" ")[0] ?? "");
+  // Name to greet the learner with.
+  const learnerName = isFamily ? settings.childName || "Explorer" : user?.name.split(" ")[0] ?? "";
 
   const value = useMemo(
     () => ({
@@ -238,23 +237,9 @@ export function AuthProvider({ children }) {
       verifyPin,
       resetPin,
     }),
-    [
-      user,
-      signedOut,
-      activeView,
-      login,
-      signup,
-      logout,
-      updateName,
-      updateDetails,
-      completeWelcome,
-      setLanguage,
-      updateParentSettings,
-      setActiveView,
-      joinClass,
-      leaveClass,
-      resetPin,
-    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, signedOut, activeView, login, signup, logout, updateName, updateDetails, completeWelcome,
+      setLanguage, updateParentSettings, setActiveView, joinClass, leaveClass, resetPin],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -40,14 +40,7 @@ export default function AuthPage({ mode }) {
     setLoading(true);
     try {
       if (isLogin) await login(email, password, role);
-      else
-        await signup({
-          name,
-          childName: isFamily ? childName : undefined,
-          email,
-          password,
-          role,
-        });
+      else await signup({ name, childName: isFamily ? childName : undefined, email, password, role });
       // the route guard redirects from here
     } catch (err) {
       setError(err.message);
@@ -68,54 +61,30 @@ export default function AuthPage({ mode }) {
         <div className="auth-side-copy">
           <p className="auth-kicker">Heritage languages, learned at home</p>
           <h2>Every family has a language worth keeping.</h2>
-          <p>
-            Short lessons, stories and traditions for children growing up far
-            from their family's country of origin.
-          </p>
+          <p>Short lessons, stories and traditions for children growing up far from their family's country of origin.</p>
         </div>
         <GlobeScene className="auth-globe" />
       </aside>
 
       <section className="auth-main">
         <div className="auth-tabs" role="tablist">
-          <Link
-            to="/login"
-            state={location.state}
-            className={isLogin ? "active" : ""}
-            role="tab"
-            aria-selected={isLogin}
-          >
+          <Link to="/login" state={location.state} className={isLogin ? "active" : ""} role="tab" aria-selected={isLogin}>
             Log in
           </Link>
-          <Link
-            to="/signup"
-            className={!isLogin ? "active" : ""}
-            role="tab"
-            aria-selected={!isLogin}
-          >
+          <Link to="/signup" className={!isLogin ? "active" : ""} role="tab" aria-selected={!isLogin}>
             Create account
           </Link>
         </div>
 
-        <h1 className="auth-title">
-          {isLogin ? "Welcome back" : "Create your account"}
-        </h1>
-        <p className="auth-sub">
-          {isLogin ? "Log in to continue." : "It takes less than a minute."}
-        </p>
+        <h1 className="auth-title">{isLogin ? "Welcome back" : "Create your account"}</h1>
+        <p className="auth-sub">{isLogin ? "Log in to continue." : "It takes less than a minute."}</p>
 
-        {location.state?.from && isLogin ? (
-          <p className="form-note">Log in to open that page.</p>
-        ) : null}
+        {location.state?.from && isLogin ? <p className="form-note">Log in to open that page.</p> : null}
 
         <form onSubmit={handleSubmit} noValidate>
           <label className="field">
             <span>I am a…</span>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="role-select"
-            >
+            <select value={role} onChange={(e) => setRole(e.target.value)} className="role-select">
               {ROLE_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
@@ -180,9 +149,7 @@ export default function AuthPage({ mode }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={isLogin ? "current-password" : "new-password"}
-                placeholder={
-                  isLogin ? "Your password" : "At least 6 characters"
-                }
+                placeholder={isLogin ? "Your password" : "At least 6 characters"}
                 required
               />
               <button
@@ -202,18 +169,8 @@ export default function AuthPage({ mode }) {
             </p>
           ) : null}
 
-          <button
-            type="submit"
-            className="btn btn-dark btn-block"
-            disabled={loading}
-          >
-            {loading
-              ? isLogin
-                ? "Logging in…"
-                : "Creating account…"
-              : isLogin
-                ? "Log in"
-                : "Create account"}
+          <button type="submit" className="btn btn-dark btn-block" disabled={loading}>
+            {loading ? (isLogin ? "Logging in…" : "Creating account…") : isLogin ? "Log in" : "Create account"}
           </button>
         </form>
 
@@ -224,12 +181,7 @@ export default function AuthPage({ mode }) {
             </p>
             <div className="demo-grid">
               {DEMO_ACCOUNTS.map((d) => (
-                <button
-                  key={d.email}
-                  type="button"
-                  className="demo-account"
-                  onClick={() => fillDemo(d)}
-                >
+                <button key={d.email} type="button" className="demo-account" onClick={() => fillDemo(d)}>
                   <b>{d.label}</b>
                   <span>{d.email}</span>
                 </button>

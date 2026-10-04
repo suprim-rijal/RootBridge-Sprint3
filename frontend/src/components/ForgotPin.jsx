@@ -32,11 +32,7 @@ export default function ForgotPin({ onDone }) {
 
   if (!open) {
     return (
-      <button
-        type="button"
-        className="pd-text-btn forgot-pin-link"
-        onClick={() => setOpen(true)}
-      >
+      <button type="button" className="pd-text-btn forgot-pin-link" onClick={() => setOpen(true)}>
         Forgot the PIN?
       </button>
     );
@@ -45,18 +41,11 @@ export default function ForgotPin({ onDone }) {
   return (
     <form className="forgot-pin" onSubmit={submit}>
       <p className="ln-muted">
-        <KeyRound size={15} aria-hidden="true" /> Enter the password of this
-        account ({user.email}) to choose a new PIN.
+        <KeyRound size={15} aria-hidden="true" /> Enter the password of this account ({user.email}) to choose a new PIN.
       </p>
       <label className="pd-field">
         <span>Account password</span>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-        />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
       </label>
       <label className="pd-field">
         <span>New PIN (leave empty to remove the PIN)</span>
@@ -65,9 +54,7 @@ export default function ForgotPin({ onDone }) {
           inputMode="numeric"
           autoComplete="off"
           value={newPin}
-          onChange={(e) =>
-            setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))
-          }
+          onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
           placeholder="••••"
         />
       </label>
@@ -77,18 +64,10 @@ export default function ForgotPin({ onDone }) {
         </p>
       ) : null}
       <div className="pd-form-actions">
-        <button
-          type="submit"
-          className="btn btn-dark btn-sm"
-          disabled={busy || !password}
-        >
+        <button type="submit" className="btn btn-dark btn-sm" disabled={busy || !password}>
           {busy ? "Checking…" : newPin ? "Set the new PIN" : "Remove the PIN"}
         </button>
-        <button
-          type="button"
-          className="pd-text-btn"
-          onClick={() => setOpen(false)}
-        >
+        <button type="button" className="pd-text-btn" onClick={() => setOpen(false)}>
           Cancel
         </button>
       </div>

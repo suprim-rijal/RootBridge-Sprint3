@@ -9,14 +9,7 @@ import { VIEWS } from "../../config/roles.js";
 // child view (a bookmark, a refresh, or a shared link). Before, those
 // simply bounced back to the dashboard with no way to type the PIN.
 export default function ParentUnlock() {
-  const {
-    user,
-    isFamily,
-    isParentView,
-    setActiveView,
-    verifyPin,
-    learnerName,
-  } = useAuth();
+  const { user, isFamily, isParentView, setActiveView, verifyPin, learnerName } = useAuth();
   const navigate = useNavigate();
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
@@ -43,9 +36,7 @@ export default function ParentUnlock() {
       setActiveView(VIEWS.PARENT);
       navigate("/parent", { replace: true });
     } catch (err) {
-      setError(
-        err.status === 401 ? "That PIN is not right. Try again." : err.message,
-      );
+      setError(err.status === 401 ? "That PIN is not right. Try again." : err.message);
       setPin("");
     } finally {
       setChecking(false);
@@ -57,9 +48,7 @@ export default function ParentUnlock() {
       <ShieldCheck size={34} aria-hidden="true" />
       <h1>Parent view</h1>
       <p className="ln-muted">
-        {locked
-          ? "Enter the 4-digit parent PIN to see progress and settings."
-          : `Leaving ${learnerName}'s view to open the parent controls.`}
+        {locked ? "Enter the 4-digit parent PIN to see progress and settings." : `Leaving ${learnerName}'s view to open the parent controls.`}
       </p>
       <form onSubmit={open} className="unlock-form">
         {locked ? (
@@ -69,9 +58,7 @@ export default function ParentUnlock() {
             autoComplete="off"
             aria-label="Parent PIN"
             value={pin}
-            onChange={(e) =>
-              setPin(e.target.value.replace(/\D/g, "").slice(0, 4))
-            }
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
             autoFocus
           />
         ) : null}
@@ -86,18 +73,10 @@ export default function ParentUnlock() {
           </p>
         ) : null}
         <div className="unlock-actions">
-          <button
-            type="submit"
-            className="btn btn-dark"
-            disabled={(locked && pin.length !== 4) || checking}
-          >
+          <button type="submit" className="btn btn-dark" disabled={(locked && pin.length !== 4) || checking}>
             {checking ? "Checking…" : "Open parent view"}
           </button>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => navigate("/dashboard", { replace: true })}
-          >
+          <button type="button" className="btn btn-ghost" onClick={() => navigate("/dashboard", { replace: true })}>
             Back to {learnerName}'s view
           </button>
         </div>

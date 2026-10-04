@@ -13,14 +13,7 @@ import { VIEWS } from "../config/roles.js";
 // Switching is instant, unless the parent switched on "Ask for a PIN".
 
 export default function ViewSwitch({ className = "" }) {
-  const {
-    isFamily,
-    isParentView,
-    learnerName,
-    user,
-    setActiveView,
-    verifyPin,
-  } = useAuth();
+  const { isFamily, isParentView, learnerName, user, setActiveView, verifyPin } = useAuth();
   const navigate = useNavigate();
   const [pinOpen, setPinOpen] = useState(false);
 
@@ -31,9 +24,7 @@ export default function ViewSwitch({ className = "" }) {
     // Navigate FIRST, then change the view. The other order leaves the
     // parent page rendered for one moment with the child view active,
     // and its guard would send us to the unlock page instead.
-    navigate(view === VIEWS.PARENT ? "/parent" : "/dashboard", {
-      replace: true,
-    });
+    navigate(view === VIEWS.PARENT ? "/parent" : "/dashboard", { replace: true });
     setActiveView(view);
   };
 
@@ -49,20 +40,12 @@ export default function ViewSwitch({ className = "" }) {
         type="button"
         className={`view-switch ${isParentView ? "is-parent" : ""} ${className}`}
         onClick={handleClick}
-        aria-label={
-          isParentView
-            ? `Switch to ${learnerName}'s view`
-            : "Switch to Parent View"
-        }
+        aria-label={isParentView ? `Switch to ${learnerName}'s view` : "Switch to Parent View"}
       >
         <span className="view-switch-track" aria-hidden="true">
-          <span className="view-switch-thumb">
-            {isParentView ? <ShieldCheck size={14} /> : <Smile size={14} />}
-          </span>
+          <span className="view-switch-thumb">{isParentView ? <ShieldCheck size={14} /> : <Smile size={14} />}</span>
         </span>
-        <span className="view-switch-text">
-          {isParentView ? "Switch to Child View" : "Switch to Parent View"}
-        </span>
+        <span className="view-switch-text">{isParentView ? "Switch to Child View" : "Switch to Parent View"}</span>
       </button>
 
       {/* Portal: the dialog lives on <body>, so it still shows when the

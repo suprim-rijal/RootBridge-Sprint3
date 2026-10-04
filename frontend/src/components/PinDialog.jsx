@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import ForgotPin from "./ForgotPin.jsx";
 
+// Asks for the 4-digit parent PIN before leaving child view.
+// Uses the native <dialog> element: it traps focus and closes with Esc.
+// Sprint 3: the PIN is checked on the server (verifyPin), so it never has
+// to be sent to the browser at all.
+
 export default function PinDialog({ open, verifyPin, onSuccess, onClose }) {
   const ref = useRef(null);
   const [pin, setPin] = useState("");
@@ -26,9 +31,7 @@ export default function PinDialog({ open, verifyPin, onSuccess, onClose }) {
       await verifyPin(pin);
       onSuccess();
     } catch (err) {
-      setError(
-        err.status === 401 ? "That PIN is not right. Try again." : err.message,
-      );
+      setError(err.status === 401 ? "That PIN is not right. Try again." : err.message);
       setPin("");
     } finally {
       setChecking(false);
@@ -36,12 +39,7 @@ export default function PinDialog({ open, verifyPin, onSuccess, onClose }) {
   };
 
   return (
-    <dialog
-      ref={ref}
-      className="pin-dialog"
-      onClose={onClose}
-      aria-labelledby="pin-title"
-    >
+    <dialog ref={ref} className="pin-dialog" onClose={onClose} aria-labelledby="pin-title">
       <form onSubmit={submit}>
         <h2 id="pin-title">Parent check</h2>
         <p>Enter the 4-digit parent PIN to open parental controls.</p>
@@ -63,18 +61,10 @@ export default function PinDialog({ open, verifyPin, onSuccess, onClose }) {
           </p>
         ) : null}
         <div className="pin-actions">
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={onClose}
-          >
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
             Cancel
           </button>
-          <button
-            type="submit"
-            className="btn btn-dark btn-sm"
-            disabled={pin.length !== 4 || checking}
-          >
+          <button type="submit" className="btn btn-dark btn-sm" disabled={pin.length !== 4 || checking}>
             {checking ? "Checking…" : "Unlock"}
           </button>
         </div>
