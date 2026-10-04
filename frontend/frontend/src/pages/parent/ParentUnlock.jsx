@@ -1,9 +1,9 @@
 /*
-FILE: frontend/src/components/PushToTalk.jsx
-OWNER: Member 2 - Learning experience
+FILE: frontend/src/pages/parent/ParentUnlock.jsx
+OWNER: Member 1 - Accounts and security
 
 WHAT THIS FILE DOES
-Speaking practice: listens with the browser, then has the server grade it.
+The way into the parent view from the child view.
 
 BEFORE YOU WRITE ANY CODE HERE
   1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.

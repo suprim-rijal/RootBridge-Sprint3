@@ -1,9 +1,9 @@
 /*
-FILE: frontend/src/components/OutOfLives.jsx
-OWNER: Member 2 - Learning experience
+FILE: backend/tests/step6.test.js
+OWNER: Member 5 - Quality, docs and deployment
 
 WHAT THIS FILE DOES
-What a learner sees at zero hearts: two honest ways back.
+An automated test file. It starts the app on a random port, talks to a real test database, and checks one area of behaviour end to end.
 
 BEFORE YOU WRITE ANY CODE HERE
   1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.

@@ -14,8 +14,7 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import TrackOff from "../../components/TrackOff.jsx";
 
 // /learn/:trackId/lesson/:lessonId — story intro, then the interactive lesson.
-// Converted from storyteller-s-library (kid.lesson.$lessonId.tsx).
-//
+// Converted from storyteller-s-library (kid.lesson.$lessonId.tsx)
 // Data flow:
 //   1. api.getLesson()  -> title + storyText (GET /api/lessons/:id)
 //   2. local curriculum      -> the vocabulary used to build the practice steps
