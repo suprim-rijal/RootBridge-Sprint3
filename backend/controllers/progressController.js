@@ -1,15 +1,4 @@
-// =====================================================================
-// Progress controller
-//   GET   /api/progress/me               my progress + lives
-//   PATCH /api/progress/me               merge progress from the browser
-//   POST  /api/progress/lives/lose       { reason: "wrong" | "hint" | "speech" }
-//   POST  /api/progress/lives/earn       { lessonId }  review of a mastered lesson
-//
-// Merging, not overwriting: lessons, modules and days are combined, so
-// progress made on two devices is never lost. The browser can NEVER set
-// the number of lives; only the lives endpoints (and the module-quest
-// refill) change them.
-// =====================================================================
+
 const Progress = require("../models/Progress");
 const Module = require("../models/Module");
 const AppError = require("../utils/AppError");

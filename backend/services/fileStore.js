@@ -1,13 +1,4 @@
-// =====================================================================
-// Files for class materials, stored INSIDE MongoDB (GridFS).
-// ---------------------------------------------------------------------
-// Why not the server's disk? Most hosting (including Render's free plan)
-// wipes the disk every time the app is redeployed, so uploaded files
-// would silently disappear. GridFS is MongoDB's built-in way to keep
-// files: it splits a file into small chunks in two collections
-// (materials.files and materials.chunks). The files then live in Atlas
-// with everything else, survive any redeploy, and are backed up with it.
-// =====================================================================
+
 const { mongoose } = require("../config/db");
 
 const BUCKET = "materials";

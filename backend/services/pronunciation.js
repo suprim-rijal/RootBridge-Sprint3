@@ -1,20 +1,4 @@
-// =====================================================================
-// Strict pronunciation grading.
-// ---------------------------------------------------------------------
-// The browser's speech recognition turns the learner's voice into text
-// (plus a few alternative guesses with confidence scores). We never get
-// the audio. This service decides how close that was to the target:
-//
-//   1. Ask Google Gemini with a strict, JSON-only prompt (below).
-//   2. If there is no key, the call fails, returns nonsense, or takes
-//      more than 4 seconds: use a stricter-than-Sprint-2 local check.
-//
-// Four verdicts:
-//   spot_on     accurate            -> counts as right
-//   close       nearly              -> keep trying, costs NO heart
-//   needs_work  a real mistake      -> wrong (costs a heart for Normal users)
-//   unclear     not enough evidence -> wrong, but said honestly
-// =====================================================================
+
 const { env } = require("../config/env");
 
 const VERDICTS = ["spot_on", "close", "needs_work", "unclear"];

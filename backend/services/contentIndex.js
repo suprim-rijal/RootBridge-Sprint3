@@ -1,11 +1,4 @@
-// =====================================================================
-// Which lesson and module ids really exist.
-// ---------------------------------------------------------------------
-// The browser tells the server which lessons are finished. Without this
-// list it could claim ANY id (or thousands of made-up ones), which would
-// fake a teacher's roster and fill the database with rubbish. The ids
-// are read once at start-up and kept in memory: 536 short strings.
-// =====================================================================
+
 const Module = require("../models/Module");
 
 let lessonIds = new Set();
