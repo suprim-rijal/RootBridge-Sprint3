@@ -12,11 +12,7 @@ import { ROLE_OPTIONS, ROLES } from "../../config/roles.js";
 // After success we do NOT navigate here: the <PublicOnly> route guard
 // sees the new user and sends them on (signup -> /welcome).
 
-const DEMO_ACCOUNTS = [
-  { email: "family@demo.com", role: ROLES.CHILD_PARENT, label: "Child/Parent" },
-  { email: "learner@demo.com", role: ROLES.NORMAL, label: "Normal" },
-  { email: "teacher@demo.com", role: ROLES.TEACHER, label: "Teacher" },
-];
+
 
 export default function AuthPage({ mode }) {
   const isLogin = mode === "login";
@@ -46,13 +42,6 @@ export default function AuthPage({ mode }) {
       setError(err.message);
       setLoading(false);
     }
-  };
-
-  const fillDemo = (demo) => {
-    setEmail(demo.email);
-    setPassword("demo123");
-    setRole(demo.role);
-    setError("");
   };
 
   return (
