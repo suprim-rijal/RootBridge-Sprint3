@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Circular Background with Border -->
+  <circle cx="256" cy="256" r="240" fill="#FDFBF7" stroke="#D49B2B" stroke-width="24" />
+  
+  <!-- Comma Body -->
+  <path d="M256,120 C335,120 390,175 390,250 C390,325 335,380 256,380 C225,380 195,370 170,350 L155,420 C153,428 162,435 170,430 C205,405 235,395 265,395 C350,395 420,330 420,250 C420,160 350,90 256,90 Z" fill="#D49B2B" />
+  
+  <!-- Inner Dot -->
+  <circle cx="310" cy="210" r="34" fill="#2C221E" />
+</svg>
