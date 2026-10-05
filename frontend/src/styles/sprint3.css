@@ -676,3 +676,26 @@
   gap: 6px;
   margin: 0;
 }
+
+.path-hero-fallback {
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  text-align: center;
+  min-height: 220px;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep, #241d47) 100%);
+  color: #fff;
+}
+.path-hero-fallback.culture {
+  background: linear-gradient(135deg, var(--terracotta) 0%, #8d3a24 100%);
+}
+.path-hero-greeting {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5vw, 46px);
+  line-height: 1.1;
+}
+.path-hero-native {
+  font-size: 16px;
+  opacity: 0.85;
+}
