@@ -1,18 +1,22 @@
-/*
-FILE: backend/config/db.js
-OWNER: Member 5 - Quality, docs and deployment
+// Connects to MongoDB with Mongoose. server.js calls this before listening.
+const mongoose = require("mongoose");
+const { env } = require("./env");
 
-WHAT THIS FILE DOES
-The single place that knows how to open, close and describe the MongoDB connection.
+mongoose.set("strictQuery", true);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+async function connectDB(uri = env.mongoUri) {
+  const conn = await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 });
+  console.log(`MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
+  return conn;
+}
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+function disconnectDB() {
+  return mongoose.connection.close();
+}
+
+// "connected", "disconnected", ... used by /api/health
+function dbState() {
+  return ["disconnected", "connected", "connecting", "disconnecting"][mongoose.connection.readyState] || "unknown";
+}
+
+module.exports = { connectDB, disconnectDB, dbState, mongoose };
