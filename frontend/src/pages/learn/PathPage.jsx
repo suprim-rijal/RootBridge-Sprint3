@@ -1,11 +1,22 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Flower2, Lock, Play, RefreshCw, Sprout } from "lucide-react";
 import ProgressBar from "../../components/ProgressBar.jsx";
 import TrackOff from "../../components/TrackOff.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { getTrack, htmlLangOf } from "../../data/curriculum.js";
+import {
+  curriculumFor,
+  getActiveLanguage,
+  getTrack,
+  htmlLangOf,
+} from "../../data/curriculum.js";
 import { nextLessonFor } from "../../lib/learningSummary.js";
-import { moduleProgress, moduleStatus, trackProgress, useProgress } from "../../lib/progress.js";
+import {
+  moduleProgress,
+  moduleStatus,
+  trackProgress,
+  useProgress,
+} from "../../lib/progress.js";
 
 // /learn/language and /learn/culture
 // Same data shape, two different layouts:
@@ -19,10 +30,44 @@ const STATUS = {
   locked: { icon: Lock, text: "Locked" },
 };
 
+// Artwork per language and track. A language gets its own picture as soon
+// as the file exists; until then a plain banner is shown, because showing
+// Nepali artwork on the Finnish path would simply be wrong.
+// File naming:  /public/assets/illustrations/<language>-<track>.jpg
 const ART = {
-  language: "/assets/illustrations/track-language.jpg",
-  culture: "/assets/illustrations/track-culture.jpg",
+  "nepali-language": "/assets/illustrations/track-language.jpg",
+  "nepali-culture": "/assets/illustrations/track-culture.jpg",
 };
+const artFor = (language, trackId) =>
+  ART[`${language}-${trackId}`] ??
+  `/assets/illustrations/${language}-${trackId}.jpg`;
+
+function TrackArt({ language, trackId, track }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return (
+      <div
+        className={`path-hero-art path-hero-fallback ${trackId}`}
+        aria-hidden="true"
+      >
+        <span className="path-hero-greeting" lang={htmlLangOf(language)}>
+          {curriculumFor(language).greeting}
+        </span>
+        <span className="path-hero-native" lang={htmlLangOf(language)}>
+          {track.nepaliTitle}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <img
+      src={artFor(language, trackId)}
+      alt=""
+      className="path-hero-art"
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 function ModuleTile({ trackId, mod, state }) {
   const status = moduleStatus(state, mod.id);
@@ -37,7 +82,9 @@ function ModuleTile({ trackId, mod, state }) {
       <span className="module-tile-name">{mod.title}</span>
       <small>
         {text}
-        {status === "in-progress" ? ` · ${progress.done}/${progress.total}` : ""}
+        {status === "in-progress"
+          ? ` · ${progress.done}/${progress.total}`
+          : ""}
       </small>
     </>
   );
@@ -49,7 +96,10 @@ function ModuleTile({ trackId, mod, state }) {
     );
   }
   return (
-    <Link to={`/learn/${trackId}/module/${mod.id}`} className={`module-tile ${status}`}>
+    <Link
+      to={`/learn/${trackId}/module/${mod.id}`}
+      className={`module-tile ${status}`}
+    >
       {content}
     </Link>
   );
@@ -63,13 +113,17 @@ function LanguageTrail({ track, state }) {
         const done = statuses.every((s) => s === "mastered");
         const open = statuses.some((s) => s !== "locked");
         return (
-          <li key={chapter.id} className={`trail-step ${done ? "done" : open ? "open" : "locked"}`}>
+          <li
+            key={chapter.id}
+            className={`trail-step ${done ? "done" : open ? "open" : "locked"}`}
+          >
             <span className="trail-num" aria-hidden="true">
               {i + 1}
             </span>
             <div className="trail-body">
               <h2>
-                <span className="trail-code">{chapter.code}</span> {chapter.title}
+                <span className="trail-code">{chapter.code}</span>{" "}
+                {chapter.title}
                 {chapter.nepaliTitle ? (
                   <span className="trail-np" lang={htmlLangOf()}>
                     {chapter.nepaliTitle}
@@ -87,7 +141,8 @@ function LanguageTrail({ track, state }) {
                 </ul>
               ) : (
                 <p className="trail-locked">
-                  <Lock size={13} aria-hidden="true" /> Opens after the chapter before it.
+                  <Lock size={13} aria-hidden="true" /> Opens after the chapter
+                  before it.
                 </p>
               )}
             </div>
@@ -134,7 +189,8 @@ export default function PathPage({ trackId }) {
   const { state } = useProgress();
   const track = getTrack(trackId);
 
-  if (!learningRules.allowedTracks[trackId]) return <TrackOff title={track.title} />;
+  if (!learningRules.allowedTracks[trackId])
+    return <TrackOff title={track.title} />;
 
   const progress = trackProgress(state, trackId);
   const next = nextLessonFor(state, trackId);
@@ -142,21 +198,35 @@ export default function PathPage({ trackId }) {
   return (
     <div className={`path-page ln-${trackId}`}>
       <section className="path-hero">
-        <img src={ART[trackId]} alt="" className="path-hero-art" />
+        <TrackArt
+          language={getActiveLanguage()}
+          trackId={trackId}
+          track={track}
+        />
         <div className="path-hero-copy">
-          <p className="path-kicker">{trackId === "language" ? "Language path" : "Culture path"}</p>
+          <p className="path-kicker">
+            {trackId === "language" ? "Language path" : "Culture path"}
+          </p>
           <h1>
             {track.title} <span lang={htmlLangOf()}>{track.nepaliTitle}</span>
           </h1>
           <p>{track.tagline}</p>
           <div className="path-hero-progress">
-            <ProgressBar value={progress.pct} label={`${track.title} progress`} />
+            <ProgressBar
+              value={progress.pct}
+              label={`${track.title} progress`}
+            />
             <span>
-              {progress.doneLessons}/{progress.lessons} lessons · {progress.mastered}/{progress.modules} modules
+              {progress.doneLessons}/{progress.lessons} lessons ·{" "}
+              {progress.mastered}/{progress.modules} modules
             </span>
           </div>
-          <Link to={`/learn/${trackId}/lesson/${next.lesson.id}`} className="btn btn-track">
-            <Play size={17} /> {progress.doneLessons ? "Continue" : "Start"}: {next.lesson.title}
+          <Link
+            to={`/learn/${trackId}/lesson/${next.lesson.id}`}
+            className="btn btn-track"
+          >
+            <Play size={17} /> {progress.doneLessons ? "Continue" : "Start"}:{" "}
+            {next.lesson.title}
           </Link>
         </div>
       </section>
