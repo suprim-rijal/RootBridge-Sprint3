@@ -9,8 +9,8 @@
     "dev": "nodemon server.js",
     "seed": "node scripts/seed.js",
     "seed:reset": "node scripts/seed.js --reset",
-    "test": "node --test --test-concurrency=1 \"tests/**/*.test.js\"",
-    "test:ci": "REQUIRE_DB=1 node --test --test-concurrency=1 \"tests/**/*.test.js\""
+    "test": "node --test --test-concurrency=1 tests",
+    "test:ci": "REQUIRE_DB=1 node --test --test-concurrency=1 tests"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
