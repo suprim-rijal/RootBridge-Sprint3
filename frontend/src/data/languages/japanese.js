@@ -1,10 +1,3 @@
-// =====================================================================
-// Japanese — language + culture courses.
-// Romanisation uses Hepburn with long vowels marked (ō, ū, ā, ī).
-// Sentences are written with a space between words (as in many
-// children's books), so the word-order exercises can split them.
-// Please have a native speaker review before a public launch.
-// =====================================================================
 import { chapter } from "./_build.js";
 
 const P = "ja";
@@ -14,19 +7,29 @@ const languageChapters = [
     code: "L1",
     title: "Greetings and sounds",
     nativeTitle: "あいさつ と おと",
-    summary: "Greet people at any time of day, be polite, and hear long and short vowels.",
+    summary:
+      "Greet people at any time of day, be polite, and hear long and short vowels.",
     modules: [
       {
         code: "L1.1",
         title: "Konnichiwa (Hello world)",
         goal: "Greet, give your name, and take two turns in a friendly exchange.",
-        lessons: ["Hear greetings in mini-scenes", "Choose the greeting by the time of day", "Say your name", "Two-turn exchange"],
+        lessons: [
+          "Hear greetings in mini-scenes",
+          "Choose the greeting by the time of day",
+          "Say your name",
+          "Two-turn exchange",
+        ],
         items: [
           ["こんにちは", "konnichiwa", "hello / good afternoon"],
           ["おはよう ございます", "ohayō gozaimasu", "good morning (polite)"],
           ["こんばんは", "konbanwa", "good evening"],
           ["さようなら", "sayōnara", "goodbye"],
-          ["わたし は ___ です。", "watashi wa ___ desu", "I am ___ / my name is ___"],
+          [
+            "わたし は ___ です。",
+            "watashi wa ___ desu",
+            "I am ___ / my name is ___",
+          ],
           ["おなまえ は？", "onamae wa?", "what is your name?"],
         ],
         note: "Japanese greetings change with the time of day: ohayō in the morning, konnichiwa in the daytime, konbanwa in the evening.",
@@ -94,7 +97,11 @@ const languageChapters = [
           ["おとうさん", "otōsan", "father"],
           ["おねえさん", "onēsan", "older sister"],
           ["おにいさん", "onīsan", "older brother"],
-          ["これ は わたし の かぞく です。", "kore wa watashi no kazoku desu", "this is my family"],
+          [
+            "これ は わたし の かぞく です。",
+            "kore wa watashi no kazoku desu",
+            "this is my family",
+          ],
         ],
         note: "Japanese uses different words for your own family and other people's. Okāsan is the polite word for a mother.",
       },
@@ -117,7 +124,8 @@ const languageChapters = [
     code: "L3",
     title: "Everyday life",
     nativeTitle: "まいにち",
-    summary: "Colours, the days of the week, and sentences you can use every day.",
+    summary:
+      "Colours, the days of the week, and sentences you can use every day.",
     modules: [
       {
         code: "L3.1",
@@ -154,9 +162,21 @@ const languageChapters = [
         goal: "Introduce yourself and ask for help.",
         items: [
           ["わかりません。", "wakarimasen", "I do not understand"],
-          ["えいご を はなせます か？", "eigo o hanasemasu ka?", "can you speak English?"],
-          ["トイレ は どこ です か？", "toire wa doko desu ka?", "where is the toilet?"],
-          ["わたし は ___ に すんで います。", "watashi wa ___ ni sunde imasu", "I live in ___"],
+          [
+            "えいご を はなせます か？",
+            "eigo o hanasemasu ka?",
+            "can you speak English?",
+          ],
+          [
+            "トイレ は どこ です か？",
+            "toire wa doko desu ka?",
+            "where is the toilet?",
+          ],
+          [
+            "わたし は ___ に すんで います。",
+            "watashi wa ___ ni sunde imasu",
+            "I live in ___",
+          ],
         ],
         note: "Ka at the end of a sentence turns it into a question.",
       },
@@ -177,7 +197,11 @@ const cultureChapters = [
         goal: "Explain why Japanese uses three sets of characters together.",
         items: [
           ["ひらがな", "hiragana", "the rounded script for Japanese words"],
-          ["カタカナ", "katakana", "the angular script, often for words from other languages"],
+          [
+            "カタカナ",
+            "katakana",
+            "the angular script, often for words from other languages",
+          ],
           ["漢字", "kanji", "characters that came from Chinese"],
           ["ローマ字", "rōmaji", "Japanese written in Latin letters"],
         ],
@@ -200,7 +224,8 @@ const cultureChapters = [
     code: "C2",
     title: "Seasons, food and places",
     nativeTitle: "きせつ と たべもの",
-    summary: "Cherry blossoms and New Year, lunch boxes and rice balls, mountains and hot springs.",
+    summary:
+      "Cherry blossoms and New Year, lunch boxes and rice balls, mountains and hot springs.",
     modules: [
       {
         code: "C2.1",
@@ -249,7 +274,8 @@ export default {
       slug: "language",
       title: "Japanese Language",
       nepaliTitle: "にほんご",
-      tagline: "Greetings, sounds, numbers, family and everyday sentences, step by step.",
+      tagline:
+        "Greetings, sounds, numbers, family and everyday sentences, step by step.",
       chapters: languageChapters,
     },
     {
@@ -262,11 +288,29 @@ export default {
     },
   ],
   facts: [
-    { title: "Three scripts", text: "Japanese uses hiragana, katakana and kanji together — sometimes all three in one sentence." },
-    { title: "Shoes off", text: "In many Japanese homes, shoes come off at the genkan, the small step by the front door." },
-    { title: "Hanami", text: "In spring, many people gather under cherry trees for hanami, to enjoy the blossoms together." },
-    { title: "Mount Fuji", text: "Mount Fuji is Japan's highest mountain, at 3,776 metres. It is a volcano." },
-    { title: "Children's Day", text: "On 5 May, many families fly colourful carp-shaped streamers called koinobori for Children's Day." },
-    { title: "Itadakimasu", text: "Many people say itadakimasu before eating, as a thank you for the food." },
+    {
+      title: "Three scripts",
+      text: "Japanese uses hiragana, katakana and kanji together — sometimes all three in one sentence.",
+    },
+    {
+      title: "Shoes off",
+      text: "In many Japanese homes, shoes come off at the genkan, the small step by the front door.",
+    },
+    {
+      title: "Hanami",
+      text: "In spring, many people gather under cherry trees for hanami, to enjoy the blossoms together.",
+    },
+    {
+      title: "Mount Fuji",
+      text: "Mount Fuji is Japan's highest mountain, at 3,776 metres. It is a volcano.",
+    },
+    {
+      title: "Children's Day",
+      text: "On 5 May, many families fly colourful carp-shaped streamers called koinobori for Children's Day.",
+    },
+    {
+      title: "Itadakimasu",
+      text: "Many people say itadakimasu before eating, as a thank you for the food.",
+    },
   ],
 };

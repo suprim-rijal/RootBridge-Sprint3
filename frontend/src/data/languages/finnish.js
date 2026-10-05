@@ -1,9 +1,3 @@
-// =====================================================================
-// Finnish — language + culture courses.
-// Content note: culture facts are written in general terms ("many
-// families", "often"). Please have a native speaker review before a
-// public launch.
-// =====================================================================
 import { chapter } from "./_build.js";
 
 const P = "fi";
@@ -13,20 +7,30 @@ const languageChapters = [
     code: "L1",
     title: "Hello and first sounds",
     nativeTitle: "Tervehdykset ja äänteet",
-    summary: "Greet people, answer simple questions and hear the short and long sounds that change Finnish words.",
+    summary:
+      "Greet people, answer simple questions and hear the short and long sounds that change Finnish words.",
     modules: [
       {
         code: "L1.1",
         title: "Moi maailma (Hello world)",
         goal: "Greet, give your name, and take two turns in a friendly exchange.",
-        lessons: ["Hear greetings in mini-scenes", "Choose the greeting by context", "Say your name", "Two-turn exchange"],
+        lessons: [
+          "Hear greetings in mini-scenes",
+          "Choose the greeting by context",
+          "Say your name",
+          "Two-turn exchange",
+        ],
         items: [
           ["Hei", "hei", "hello"],
           ["Moi", "moi", "hi (casual)"],
           ["Kiitos", "kiitos", "thank you"],
           ["Nähdään", "nähdään", "see you"],
           ["Minun nimeni on ___.", "minun nimeni on ___", "my name is ___"],
-          ["Mikä sinun nimesi on?", "mikä sinun nimesi on?", "what is your name?"],
+          [
+            "Mikä sinun nimesi on?",
+            "mikä sinun nimesi on?",
+            "what is your name?",
+          ],
         ],
         note: "Finnish has no words for “a” or “the”, and Moi works for both hello and goodbye among friends.",
       },
@@ -93,7 +97,11 @@ const languageChapters = [
           ["sisko", "sis-ko", "sister"],
           ["veli", "ve-li", "brother"],
           ["mummo", "mum-mo", "grandmother"],
-          ["Tämä on minun äitini.", "tämä on minun äitini", "this is my mother"],
+          [
+            "Tämä on minun äitini.",
+            "tämä on minun äitini",
+            "this is my mother",
+          ],
         ],
       },
       {
@@ -106,7 +114,11 @@ const languageChapters = [
           ["maito", "mai-to", "milk"],
           ["kahvi", "kah-vi", "coffee"],
           ["omena", "o-me-na", "apple"],
-          ["Saanko vettä, kiitos?", "saanko vettä, kiitos?", "may I have some water, please?"],
+          [
+            "Saanko vettä, kiitos?",
+            "saanko vettä, kiitos?",
+            "may I have some water, please?",
+          ],
         ],
         note: "Vesi becomes vettä in “Saanko vettä?” — Finnish words change their endings depending on how they are used.",
       },
@@ -116,7 +128,8 @@ const languageChapters = [
     code: "L3",
     title: "Everyday life",
     nativeTitle: "Arki",
-    summary: "Colours, the days of the week, and sentences you can use every day.",
+    summary:
+      "Colours, the days of the week, and sentences you can use every day.",
     modules: [
       {
         code: "L3.1",
@@ -191,7 +204,11 @@ const cultureChapters = [
           ["metsä", "met-sä", "forest"],
           ["marja", "mar-ja", "berry"],
           ["mökki", "mök-ki", "summer cottage"],
-          ["jokamiehenoikeus", "jo-ka-mie-hen-oi-keus", "everyman's right: the freedom to walk and pick berries in nature"],
+          [
+            "jokamiehenoikeus",
+            "jo-ka-mie-hen-oi-keus",
+            "everyman's right: the freedom to walk and pick berries in nature",
+          ],
         ],
         note: "Everyman's right lets people walk in most forests and pick berries, with rules that protect homes and crops.",
       },
@@ -201,7 +218,8 @@ const cultureChapters = [
     code: "C2",
     title: "Celebrations, food and stories",
     nativeTitle: "Juhlat, ruoka ja tarinat",
-    summary: "Midsummer and May Day, rye bread and Karelian pies, the Kalevala and the Moomins.",
+    summary:
+      "Midsummer and May Day, rye bread and Karelian pies, the Kalevala and the Moomins.",
     modules: [
       {
         code: "C2.1",
@@ -211,7 +229,11 @@ const cultureChapters = [
           ["juhannus", "ju-han-nus", "Midsummer, in late June"],
           ["joulu", "jou-lu", "Christmas"],
           ["vappu", "vap-pu", "May Day, 1 May"],
-          ["itsenäisyyspäivä", "it-se-näi-syys-päi-vä", "Independence Day, 6 December"],
+          [
+            "itsenäisyyspäivä",
+            "it-se-näi-syys-päi-vä",
+            "Independence Day, 6 December",
+          ],
         ],
       },
       {
@@ -220,7 +242,11 @@ const cultureChapters = [
         goal: "Recognise everyday Finnish foods.",
         items: [
           ["ruisleipä", "ruis-lei-pä", "dark rye bread"],
-          ["karjalanpiirakka", "kar-ja-lan-pii-rak-ka", "Karelian pie, often filled with rice porridge"],
+          [
+            "karjalanpiirakka",
+            "kar-ja-lan-pii-rak-ka",
+            "Karelian pie, often filled with rice porridge",
+          ],
           ["puuro", "puu-ro", "porridge"],
           ["mustikka", "mus-tik-ka", "blueberry"],
           ["korvapuusti", "kor-va-puus-ti", "cinnamon bun"],
@@ -251,7 +277,8 @@ export default {
       slug: "language",
       title: "Finnish Language",
       nepaliTitle: "Suomen kieli",
-      tagline: "Greetings, sounds, numbers, family and everyday sentences, step by step.",
+      tagline:
+        "Greetings, sounds, numbers, family and everyday sentences, step by step.",
       chapters: languageChapters,
     },
     {
@@ -264,11 +291,29 @@ export default {
     },
   ],
   facts: [
-    { title: "Sauna", text: "Sauna is a Finnish word used all over the world. Many homes and apartment buildings in Finland have one." },
-    { title: "Everyman's right", text: "In Finland, everyone may walk in most forests and pick berries and mushrooms, while respecting homes and nature." },
-    { title: "Independence Day", text: "Finland became independent on 6 December 1917. Many families light two candles in the window that evening." },
-    { title: "The Moomins", text: "The Moomins, the round white trolls from Moominvalley, were created by the Finnish writer and artist Tove Jansson." },
-    { title: "Midsummer", text: "Juhannus is celebrated in late June, when the nights are very light. Many people spend it at a summer cottage by a lake." },
-    { title: "The land of lakes", text: "Finland has around 188,000 lakes, which is why it is often called the land of a thousand lakes." },
+    {
+      title: "Sauna",
+      text: "Sauna is a Finnish word used all over the world. Many homes and apartment buildings in Finland have one.",
+    },
+    {
+      title: "Everyman's right",
+      text: "In Finland, everyone may walk in most forests and pick berries and mushrooms, while respecting homes and nature.",
+    },
+    {
+      title: "Independence Day",
+      text: "Finland became independent on 6 December 1917. Many families light two candles in the window that evening.",
+    },
+    {
+      title: "The Moomins",
+      text: "The Moomins, the round white trolls from Moominvalley, were created by the Finnish writer and artist Tove Jansson.",
+    },
+    {
+      title: "Midsummer",
+      text: "Juhannus is celebrated in late June, when the nights are very light. Many people spend it at a summer cottage by a lake.",
+    },
+    {
+      title: "The land of lakes",
+      text: "Finland has around 188,000 lakes, which is why it is often called the land of a thousand lakes.",
+    },
   ],
 };

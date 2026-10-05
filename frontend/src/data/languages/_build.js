@@ -1,20 +1,20 @@
-// =====================================================================
-// Helpers to write a language's course in the SAME shape as the Nepali
-// files (language.js / culture.js), so every page, the lesson engine and
-// the seed script work for it unchanged.
-//
-// Ids get a language prefix ("fi-l1-1") so they never clash with Nepali
-// ("l1-1"). Items always use np (the word in its own script), rom
-// (romanisation or a pronunciation guide) and en (English meaning).
-// =====================================================================
-
 const LANGUAGE_PHASES = ["Encounter", "Notice", "Retrieve", "Use"];
 const CULTURE_PHASES = ["Encounter", "Notice", "Compare", "Create"];
 
 const defaultLessonTitles = (kind, title) =>
   kind === "culture"
-    ? [`Discover: ${title}`, "Look closer", "Compare with home", "Make it your own"]
-    : [`Hear it: ${title}`, "Notice the pattern", "Remember and say it", "Use it in a short exchange"];
+    ? [
+        `Discover: ${title}`,
+        "Look closer",
+        "Compare with home",
+        "Make it your own",
+      ]
+    : [
+        `Hear it: ${title}`,
+        "Notice the pattern",
+        "Remember and say it",
+        "Use it in a short exchange",
+      ];
 
 // One module. `kind` is "language" or "culture".
 export function mod(prefix, kind, spec) {
@@ -26,10 +26,30 @@ export function mod(prefix, kind, spec) {
     code: spec.code,
     title: spec.title,
     goal: spec.goal,
-    lessons: titles.map((title, i) => ({ id: `${id}-l${i + 1}`, title, phase: phases[i] ?? "Use", minutes: 7 })),
-    items: spec.items.map(([np, rom, en, note]) => ({ np, rom, en, ...(note ? { note } : {}) })),
-    skills: spec.skills ?? (kind === "culture" ? ["culture", "listening"] : ["listening", "speaking", "reading"]),
-    mechanics: spec.mechanics ?? ["hear-find", "typing", "echo", "match", "meaning"],
+    lessons: titles.map((title, i) => ({
+      id: `${id}-l${i + 1}`,
+      title,
+      phase: phases[i] ?? "Use",
+      minutes: 7,
+    })),
+    items: spec.items.map(([np, rom, en, note]) => ({
+      np,
+      rom,
+      en,
+      ...(note ? { note } : {}),
+    })),
+    skills:
+      spec.skills ??
+      (kind === "culture"
+        ? ["culture", "listening"]
+        : ["listening", "speaking", "reading"]),
+    mechanics: spec.mechanics ?? [
+      "hear-find",
+      "typing",
+      "echo",
+      "match",
+      "meaning",
+    ],
     xp: spec.xp ?? 100,
     testTasks: spec.testTasks ?? [`Show what you learned in “${spec.title}”`],
     note: spec.note ?? "",

@@ -1,12 +1,3 @@
-// =====================================================================
-// Twi (Akan, Ghana) — language + culture courses.
-// Twi uses the letters ɛ and ɔ, and tone (the pitch of the voice) can
-// change a word's meaning. The rom field is a simple pronunciation guide,
-// not a full tone transcription.
-// Customs differ between Akan communities, so culture facts are written
-// in general terms. The wording and spellings here were reviewed by a
-// Twi speaker; keep that review in place when adding new content.
-// =====================================================================
 import { chapter } from "./_build.js";
 
 const P = "tw";
@@ -16,13 +7,19 @@ const languageChapters = [
     code: "L1",
     title: "Greetings and sounds",
     nativeTitle: "Nkyia ne nnyegyeɛ",
-    summary: "Welcome people, greet them by the time of day, and meet the letters ɛ and ɔ.",
+    summary:
+      "Welcome people, greet them by the time of day, and meet the letters ɛ and ɔ.",
     modules: [
       {
         code: "L1.1",
         title: "Akwaaba (Welcome)",
         goal: "Greet, give your name, and take two turns in a friendly exchange.",
-        lessons: ["Hear greetings in mini-scenes", "Choose the greeting by the time of day", "Say your name", "Two-turn exchange"],
+        lessons: [
+          "Hear greetings in mini-scenes",
+          "Choose the greeting by the time of day",
+          "Say your name",
+          "Two-turn exchange",
+        ],
         items: [
           ["Akwaaba", "ah-kwaa-ba", "welcome"],
           ["Maakye", "maa-chay", "good morning"],
@@ -109,7 +106,11 @@ const languageChapters = [
           ["fufuo", "fu-fu-o", "fufu, a pounded dish eaten with soup"],
           ["nkate", "n-ka-te", "groundnuts (peanuts)"],
           ["dwaso", "jwa-so", "market"],
-          ["Mepa wo kyɛw, ma me nsuo.", "me-pa wo chew, ma me n-su-o", "please, give me some water"],
+          [
+            "Mepa wo kyɛw, ma me nsuo.",
+            "me-pa wo chew, ma me n-su-o",
+            "please, give me some water",
+          ],
         ],
       },
     ],
@@ -118,7 +119,8 @@ const languageChapters = [
     code: "L3",
     title: "Everyday life",
     nativeTitle: "Da biara asetena",
-    summary: "Colours, the days of the week, and sentences you can use every day.",
+    summary:
+      "Colours, the days of the week, and sentences you can use every day.",
     modules: [
       {
         code: "L3.1",
@@ -189,7 +191,11 @@ const cultureChapters = [
         items: [
           ["kente", "ken-te", "a handwoven cloth with bright patterns"],
           ["Adinkra", "a-din-kra", "symbols that each carry a meaning"],
-          ["Gye Nyame", "jeh nya-me", "an Adinkra symbol about the power of God"],
+          [
+            "Gye Nyame",
+            "jeh nya-me",
+            "an Adinkra symbol about the power of God",
+          ],
           ["Sankofa", "san-ko-fa", "an Adinkra symbol: learn from the past"],
         ],
       },
@@ -199,7 +205,8 @@ const cultureChapters = [
     code: "C2",
     title: "Stories, food and festivals",
     nativeTitle: "Anansesɛm, aduane ne afahyɛ",
-    summary: "Ananse the spider, talking drums, jollof and kelewele, festivals and cities.",
+    summary:
+      "Ananse the spider, talking drums, jollof and kelewele, festivals and cities.",
     modules: [
       {
         code: "C2.1",
@@ -208,7 +215,11 @@ const cultureChapters = [
         items: [
           ["Ananse", "a-nan-se", "the clever spider of Akan folk tales"],
           ["Anansesɛm", "a-nan-se-sem", "Ananse stories"],
-          ["atumpan", "a-tum-pan", "talking drums that copy the tones of speech"],
+          [
+            "atumpan",
+            "a-tum-pan",
+            "talking drums that copy the tones of speech",
+          ],
           ["highlife", "high-life", "a popular Ghanaian music style"],
         ],
       },
@@ -228,9 +239,17 @@ const cultureChapters = [
         title: "Festivals and places",
         goal: "Name a few Ghanaian festivals and cities.",
         items: [
-          ["Akwasidae", "a-kwa-si-dae", "an Akan festival held on a Sunday, every six weeks"],
+          [
+            "Akwasidae",
+            "a-kwa-si-dae",
+            "an Akan festival held on a Sunday, every six weeks",
+          ],
           ["Odwira", "o-jwi-ra", "a harvest and cleansing festival"],
-          ["Kumasi", "ku-ma-si", "a major city, the historic seat of the Asante kingdom"],
+          [
+            "Kumasi",
+            "ku-ma-si",
+            "a major city, the historic seat of the Asante kingdom",
+          ],
           ["Accra", "ak-kra", "Accra, the capital of Ghana"],
         ],
       },
@@ -248,7 +267,8 @@ export default {
       slug: "language",
       title: "Twi Language",
       nepaliTitle: "Twi kasa",
-      tagline: "Greetings, sounds, numbers, family and everyday sentences, step by step.",
+      tagline:
+        "Greetings, sounds, numbers, family and everyday sentences, step by step.",
       chapters: languageChapters,
     },
     {
@@ -256,16 +276,35 @@ export default {
       slug: "culture",
       title: "Discover Ghana",
       nepaliTitle: "Ghana amammerɛ",
-      tagline: "Day names, kente and Adinkra, Ananse stories, food and festivals.",
+      tagline:
+        "Day names, kente and Adinkra, Ananse stories, food and festivals.",
       chapters: cultureChapters,
     },
   ],
   facts: [
-    { title: "Day names", text: "Many Akan children receive a name linked to the day they were born. Kofi, for example, is a boy born on a Friday." },
-    { title: "Kente", text: "Kente is a handwoven cloth made in strips, with bright patterns. It is often worn on special occasions." },
-    { title: "Sankofa", text: "Sankofa is an Adinkra symbol, often shown as a bird looking back. It means: learn from the past." },
-    { title: "Ananse", text: "Ananse the clever spider is the hero of many Akan folk tales, told across Ghana and beyond." },
-    { title: "Accra", text: "Accra, on the Atlantic coast, is the capital of Ghana." },
-    { title: "Talking drums", text: "Because Twi uses tone, talking drums called atumpan can copy the rise and fall of spoken words." },
+    {
+      title: "Day names",
+      text: "Many Akan children receive a name linked to the day they were born. Kofi, for example, is a boy born on a Friday.",
+    },
+    {
+      title: "Kente",
+      text: "Kente is a handwoven cloth made in strips, with bright patterns. It is often worn on special occasions.",
+    },
+    {
+      title: "Sankofa",
+      text: "Sankofa is an Adinkra symbol, often shown as a bird looking back. It means: learn from the past.",
+    },
+    {
+      title: "Ananse",
+      text: "Ananse the clever spider is the hero of many Akan folk tales, told across Ghana and beyond.",
+    },
+    {
+      title: "Accra",
+      text: "Accra, on the Atlantic coast, is the capital of Ghana.",
+    },
+    {
+      title: "Talking drums",
+      text: "Because Twi uses tone, talking drums called atumpan can copy the rise and fall of spoken words.",
+    },
   ],
 };

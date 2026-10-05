@@ -1,14 +1,3 @@
-// Curricula for every language, in one place.
-// Tracks -> chapters -> modules -> lessons. Each module also has vocabulary "items".
-//
-// Sprint 3: more than one language. The Nepali curriculum (from
-// storyteller-s-library) is unchanged; Finnish, Japanese and Twi live in
-// ./languages/. The learner's chosen language is the "active" one, so
-// getTrack("language") returns THEIR language track, and every page that
-// already calls getTrack / trackModules works for every language without
-// changes. Module, lesson and chapter ids are unique across languages
-// ("l1-1" is Nepali, "fi-l1-1" is Finnish), so getModule / getLesson can
-// search all of them.
 import { languageChapters } from "./language.js";
 import { cultureChapters } from "./culture.js";
 import { cultureFacts as nepaliFacts } from "./cultureFacts.js";
@@ -38,7 +27,13 @@ const nepaliTracks = [
     chapters: cultureChapters,
   },
 ];
-const nepali = { language: "nepali", speechLang: "ne-NP", greeting: "नमस्ते", tracks: nepaliTracks, facts: nepaliFacts };
+const nepali = {
+  language: "nepali",
+  speechLang: "ne-NP",
+  greeting: "नमस्ते",
+  tracks: nepaliTracks,
+  facts: nepaliFacts,
+};
 
 // Every language with content. To add one: write ./languages/<name>.js
 // and list it here (and set it "active" in languages.js).
@@ -49,7 +44,8 @@ const CURRICULA = { nepali, finnish, japanese, twi };
 for (const curriculum of Object.values(CURRICULA)) {
   for (const track of curriculum.tracks) {
     track.language = curriculum.language;
-    for (const ch of track.chapters) for (const m of ch.modules) m.language = curriculum.language;
+    for (const ch of track.chapters)
+      for (const m of ch.modules) m.language = curriculum.language;
   }
 }
 
@@ -59,7 +55,8 @@ function setActiveLanguage(language) {
   activeLanguage = CURRICULA[language] ? language : "nepali";
 }
 const getActiveLanguage = () => activeLanguage;
-const curriculumFor = (language = activeLanguage) => CURRICULA[language] ?? nepali;
+const curriculumFor = (language = activeLanguage) =>
+  CURRICULA[language] ?? nepali;
 
 // Kept for Sprint 2 code: the ACTIVE language's tracks.
 const activeTracks = () => curriculumFor().tracks;
@@ -70,8 +67,11 @@ const allModules = allChapters.flatMap((c) => c.modules);
 // Accepts "language" (the active language) and the API id "finnish-language".
 const getTrack = (id = "") => {
   const text = String(id);
-  const [prefix, rest] = text.includes("-") ? [text.split("-")[0], text.split("-").slice(1).join("-")] : [null, text];
-  const list = prefix && CURRICULA[prefix] ? CURRICULA[prefix].tracks : activeTracks();
+  const [prefix, rest] = text.includes("-")
+    ? [text.split("-")[0], text.split("-").slice(1).join("-")]
+    : [null, text];
+  const list =
+    prefix && CURRICULA[prefix] ? CURRICULA[prefix].tracks : activeTracks();
   return list.find((t) => t.id === rest || t.slug === rest);
 };
 const getChapter = (id) => allChapters.find((c) => c.id === id);
@@ -82,10 +82,12 @@ const getTrackOfChapter = (chapterId) =>
   everyTrack.find((t) => t.chapters.some((c) => c.id === chapterId));
 // Speech and HTML language codes, for speaking words and for screen readers.
 const HTML_LANG = { nepali: "ne", finnish: "fi", japanese: "ja", twi: "ak" };
-const speechLangOf = (language = activeLanguage) => curriculumFor(language).speechLang;
+const speechLangOf = (language = activeLanguage) =>
+  curriculumFor(language).speechLang;
 const htmlLangOf = (language = activeLanguage) => HTML_LANG[language] ?? "ne";
 // The language of a module or lesson id.
-const languageOfModule = (moduleId) => getModule(moduleId)?.language ?? "nepali";
+const languageOfModule = (moduleId) =>
+  getModule(moduleId)?.language ?? "nepali";
 const getLesson = (lessonId) => {
   for (const mod of allModules) {
     const lesson = mod.lessons.find((l) => l.id === lessonId);
