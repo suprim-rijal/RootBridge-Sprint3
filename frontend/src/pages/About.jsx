@@ -1,18 +1,96 @@
-/*
-FILE: frontend/src/pages/About.jsx
-OWNER: Member 5 - Quality, docs and deployment
+import { Book, Heart, Globe } from "lucide-react";
 
-WHAT THIS FILE DOES
-The public About page: what RootBridge is for and who built it.
+export default function About() {
+  return (
+    <div className="about-page">
+      <div className="about-header">
+        <h1 className="h-display">Discovering Who We Are</h1>
+        <div className="tagline">
+          Heritage learning custom-crafted for the next generation.
+        </div>
+      </div>
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+      <div className="about-section">
+        <h2>Our Mission</h2>
+        <p>
+          For families growing up away from their countries of origin, culture
+          and language are more than items on a page—they are lines of
+          connection to grandparents, cousins, and ancestral history. RootBridge
+          was created to make heritage language learning engaging, interactive,
+          and personalized, allowing children to learn comfortably at their own
+          pace.
+        </p>
+      </div>
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+      <div className="about-section">
+        <h2 style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <Globe /> Core pillars
+        </h2>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "24px",
+            marginTop: "20px",
+          }}
+        >
+          <div>
+            <h4
+              style={{
+                margin: "0 0 10px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "var(--terracotta)",
+              }}
+            >
+              <Heart size={18} /> Love for Heritage
+            </h4>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "14.5px",
+                color: "var(--ink-soft)",
+              }}
+            >
+              We go beyond grammar to teach tales, proverbs, recipes, and
+              seasonal geography.
+            </p>
+          </div>
+          <div>
+            <h4
+              style={{
+                margin: "0 0 10px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "var(--indigo)",
+              }}
+            >
+              <Book size={18} /> Game-like Focus
+            </h4>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "14.5px",
+                color: "var(--ink-soft)",
+              }}
+            >
+              Bite-sized speaking prompts and matching mini-games turn learning
+              into daily play.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="about-section">
+        <h2>Active Support</h2>
+        <p>
+          RootBridge provides lessons in Twi (Ghana), Yoruba (Nigeria), and
+          Nepali. Additional languages are currently in active design,
+          prioritizing high-immersion cultural passbooks.
+        </p>
+      </div>
+    </div>
+  );
+}

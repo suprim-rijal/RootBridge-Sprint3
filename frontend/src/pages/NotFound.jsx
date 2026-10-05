@@ -1,18 +1,18 @@
-/*
-FILE: frontend/src/pages/NotFound.jsx
-OWNER: Member 5 - Quality, docs and deployment
+import { Link } from "react-router-dom";
 
-WHAT THIS FILE DOES
-The 404 page.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+export default function NotFound() {
+  return (
+    <div className="ln-page ln-center" style={{ paddingTop: 60 }}>
+      <p className="auth-side-np" lang="ne" style={{ color: "var(--terracotta)" }}>
+        ओहो!
+      </p>
+      <h1 className="ln-title">This page does not exist</h1>
+      <p className="ln-sub">The link may be old or mistyped.</p>
+      <p style={{ marginTop: 24 }}>
+        <Link to="/" className="btn btn-primary">
+          Go to the home page
+        </Link>
+      </p>
+    </div>
+  );
+}

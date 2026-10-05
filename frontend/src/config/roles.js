@@ -1,18 +1,42 @@
-/*
-FILE: frontend/src/config/roles.js
-OWNER: Member 5 - Quality, docs and deployment
+// =====================================================================
+// User roles
+// ---------------------------------------------------------------------
+// Chosen from the role menu on the login and signup pages.
+//   CHILD_PARENT  one family account: child view (learning + Cultural
+//                 Passport) and parent view (administrative)
+//   NORMAL        independent learner: learning + standard profile
+//   TEACHER       teacher workspace
+// Sprint 3: the Admin role was removed.
+// Values match backend/config/roles.js.
+// =====================================================================
 
-WHAT THIS FILE DOES
-The frontend's copy of the role names, plus where each role belongs after login.
+export const ROLES = Object.freeze({
+  CHILD_PARENT: "CombinedChildParent",
+  NORMAL: "NormalUser",
+  TEACHER: "Teacher",
+});
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+// Order and wording of the role menu.
+export const ROLE_OPTIONS = Object.freeze([
+  { value: ROLES.CHILD_PARENT, label: "Child/Parent" },
+  { value: ROLES.NORMAL, label: "Normal" },
+  { value: ROLES.TEACHER, label: "Teacher" },
+]);
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+export const ROLE_LABELS = Object.freeze(Object.fromEntries(ROLE_OPTIONS.map((o) => [o.value, o.label])));
+
+// Roles that use the dashboard and the learning paths.
+export const LEARNER_ROLES = Object.freeze([ROLES.CHILD_PARENT, ROLES.NORMAL]);
+
+// The two views inside a Child/Parent account.
+export const VIEWS = Object.freeze({ CHILD: "child", PARENT: "parent" });
+
+// Home page for a role (and, for families, for the current view).
+export function homeFor(role, view = VIEWS.CHILD) {
+  if (role === ROLES.CHILD_PARENT) return view === VIEWS.PARENT ? "/parent" : "/dashboard";
+  if (role === ROLES.NORMAL) return "/dashboard";
+  if (role === ROLES.TEACHER) return "/teacher";
+  return "/";
+}
+
+export const isKnownRole = (role) => Object.values(ROLES).includes(role);

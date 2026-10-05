@@ -1,18 +1,21 @@
-/*
-FILE: backend/routes/pronunciationRoutes.js
-OWNER: Member 5 - Quality, docs and deployment
+// Pronunciation route. Mounted at /api/pronunciation. Learners only,
+// and rate-limited so the free Gemini quota is not used up.
+const express = require("express");
+const rateLimit = require("express-rate-limit");
+const { gradePronunciation } = require("../controllers/pronunciationController");
+const { protect, requireRole } = require("../middleware/auth");
+const { LEARNER_ROLES } = require("../config/roles");
 
-WHAT THIS FILE DOES
-One route, with its own rate limit.
+const router = express.Router();
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: Number(process.env.PRONUNCIATION_RATE_LIMIT) || 30,
+  keyGenerator: (req) => String(req.user?._id ?? req.ip),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: "Lots of practice! Wait a minute, then try again." },
+});
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+router.post("/grade", protect, requireRole(...LEARNER_ROLES), limiter, gradePronunciation);
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = router;
