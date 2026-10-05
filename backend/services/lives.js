@@ -1,18 +1,50 @@
-/*
-FILE: backend/services/lives.js
-OWNER: Member 2 - Learning experience
 
-WHAT THIS FILE DOES
-All the hearts rules in one file, with no database and no HTTP - which is why they can be tested with fixed clock times.
+const { MAX_LIVES } = require("../models/Progress");
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+const REGEN_MS = 4 * 60 * 60 * 1000; // 4 hours
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+// Adds any hearts earned by waiting. Returns true if something changed.
+function applyRegen(progress, now = new Date()) {
+  if (progress.lives >= MAX_LIVES) {
+    progress.livesClockAt = null;
+    return false;
+  }
+  if (!progress.livesClockAt) {
+    progress.livesClockAt = now;
+    return true;
+  }
+  const passed = now.getTime() - new Date(progress.livesClockAt).getTime();
+  const earned = Math.floor(passed / REGEN_MS);
+  if (earned <= 0) return false;
+
+  progress.lives = Math.min(MAX_LIVES, progress.lives + earned);
+  progress.livesClockAt = progress.lives >= MAX_LIVES ? null : new Date(new Date(progress.livesClockAt).getTime() + earned * REGEN_MS);
+  return true;
+}
+
+function loseLife(progress, now = new Date()) {
+  applyRegen(progress, now);
+  if (progress.lives <= 0) return false; // nothing left to lose
+  const wasFull = progress.lives >= MAX_LIVES;
+  progress.lives -= 1;
+  if (wasFull) progress.livesClockAt = now; // the clock starts at the first lost heart
+  return true;
+}
+
+function refill(progress, now = new Date()) {
+  progress.lives = MAX_LIVES;
+  progress.livesClockAt = null;
+  progress.livesLastRefillAt = now;
+}
+
+// What the frontend needs to draw the hearts and the countdown.
+function livesInfo(progress, enabled, now = new Date()) {
+  if (!enabled) return { enabled: false };
+  const nextHeartAt =
+    progress.lives < MAX_LIVES && progress.livesClockAt
+      ? new Date(new Date(progress.livesClockAt).getTime() + REGEN_MS).toISOString()
+      : null;
+  return { enabled: true, lives: progress.lives, max: MAX_LIVES, nextHeartAt, now: now.toISOString() };
+}
+
+module.exports = { MAX_LIVES, REGEN_MS, applyRegen, loseLife, refill, livesInfo };

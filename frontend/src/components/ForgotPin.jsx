@@ -1,18 +1,76 @@
-/*
-FILE: frontend/src/components/ForgotPin.jsx
-OWNER: Member 1 - Accounts and security
+import { useState } from "react";
+import { KeyRound } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
 
-WHAT THIS FILE DOES
-Recovering a forgotten parent PIN with the account password.
+// "Forgot the PIN?" — the parent proves who they are with the account
+// password, then picks a new PIN or removes it. Without this, a forgotten
+// PIN would lock a parent out of their own parent view for good.
+export default function ForgotPin({ onDone }) {
+  const { user, resetPin } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+  const submit = async (event) => {
+    event.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const res = await resetPin({ password, newPin });
+      setOpen(false);
+      setPassword("");
+      setNewPin("");
+      onDone?.(res.message);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+  if (!open) {
+    return (
+      <button type="button" className="pd-text-btn forgot-pin-link" onClick={() => setOpen(true)}>
+        Forgot the PIN?
+      </button>
+    );
+  }
+
+  return (
+    <form className="forgot-pin" onSubmit={submit}>
+      <p className="ln-muted">
+        <KeyRound size={15} aria-hidden="true" /> Enter the password of this account ({user.email}) to choose a new PIN.
+      </p>
+      <label className="pd-field">
+        <span>Account password</span>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+      </label>
+      <label className="pd-field">
+        <span>New PIN (leave empty to remove the PIN)</span>
+        <input
+          className="pin-input"
+          inputMode="numeric"
+          autoComplete="off"
+          value={newPin}
+          onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          placeholder="••••"
+        />
+      </label>
+      {error ? (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      ) : null}
+      <div className="pd-form-actions">
+        <button type="submit" className="btn btn-dark btn-sm" disabled={busy || !password}>
+          {busy ? "Checking…" : newPin ? "Set the new PIN" : "Remove the PIN"}
+        </button>
+        <button type="button" className="pd-text-btn" onClick={() => setOpen(false)}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}

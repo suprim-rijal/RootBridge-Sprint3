@@ -1,18 +1,44 @@
-/*
-FILE: frontend/src/pages/learn/LearnLayout.jsx
-OWNER: Member 2 - Learning experience
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { ArrowLeft, BookOpen, Landmark, Star } from "lucide-react";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { levelFromXp, useProgress } from "../../lib/progress.js";
 
-WHAT THIS FILE DOES
-One screen of the website. It fetches what it needs, composes components, and decides what each action means.
+// Layout for everything under /learn: its own top bar, separate from
+// the site navbar, so the course feels like its own space.
+const PATHS = [
+  { id: "language", label: "Language path", icon: BookOpen },
+  { id: "culture", label: "Culture path", icon: Landmark },
+];
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+export default function LearnLayout() {
+  const { learningRules } = useAuth();
+  const { state } = useProgress();
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+  return (
+    <div className="learn-shell">
+      <header className="learn-bar">
+        <Link to="/dashboard" className="learn-exit">
+          <ArrowLeft size={17} aria-hidden="true" />
+          <span>Dashboard</span>
+        </Link>
+
+        <nav className="learn-tabs" aria-label="Learning paths">
+          {PATHS.filter((p) => learningRules.allowedTracks[p.id]).map(({ id, label, icon: Icon }) => (
+            <NavLink key={id} to={`/learn/${id}`} className={({ isActive }) => `learn-tab ln-${id} ${isActive ? "active" : ""}`}>
+              <Icon size={16} aria-hidden="true" />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <span className="learn-xp">
+          <Star size={14} aria-hidden="true" /> {state.xp} XP · Level {levelFromXp(state.xp)}
+        </span>
+      </header>
+
+      <main id="main" className="learn-main">
+        <Outlet />
+      </main>
+    </div>
+  );
+}

@@ -1,18 +1,17 @@
-/*
-FILE: frontend/src/components/LivesBar.jsx
-OWNER: Member 2 - Learning experience
+import { Heart } from "lucide-react";
 
-WHAT THIS FILE DOES
-Draws the hearts. Used by the navbar and inside lessons so both always look the same.
+// The hearts. Used in the top bar (every page) and inside a lesson.
+// Only Normal learners have hearts; for anyone else this draws nothing.
+export default function LivesBar({ lives, compact = false }) {
+  if (!lives?.enabled) return null;
+  const max = lives.max ?? 7;
+  const size = compact ? 15 : 17;
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+  return (
+    <span className={`ln-hearts ${compact ? "compact" : ""} ${lives.lives === 0 ? "empty" : ""}`} aria-label={`${lives.lives} of ${max} hearts left`}>
+      {Array.from({ length: max }, (_, i) => (
+        <Heart key={i} size={size} className={i < lives.lives ? "full" : "empty"} aria-hidden="true" />
+      ))}
+    </span>
+  );
+}

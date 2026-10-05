@@ -1,18 +1,32 @@
-/*
-FILE: backend/services/fileStore.js
-OWNER: Member 3 - Classes and teachers
 
-WHAT THIS FILE DOES
-Stores uploaded files inside MongoDB using GridFS.
+const { mongoose } = require("../config/db");
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+const BUCKET = "materials";
+const bucket = () => new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: BUCKET });
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+// Saves a file and returns its id.
+function saveFile(buffer, { fileName, mimeType }) {
+  return new Promise((resolve, reject) => {
+    const upload = bucket().openUploadStream(fileName, { metadata: { mimeType } });
+    upload.on("finish", () => resolve(upload.id));
+    upload.on("error", reject);
+    upload.end(buffer);
+  });
+}
+
+// A readable stream of the file, or null if it does not exist.
+async function openFile(id) {
+  const [info] = await bucket().find({ _id: new mongoose.Types.ObjectId(String(id)) }).toArray();
+  return info ? { stream: bucket().openDownloadStream(info._id), size: info.length } : null;
+}
+
+async function deleteFile(id) {
+  if (!id) return;
+  try {
+    await bucket().delete(new mongoose.Types.ObjectId(String(id)));
+  } catch {
+    // already gone: nothing to do
+  }
+}
+
+module.exports = { saveFile, openFile, deleteFile, BUCKET };

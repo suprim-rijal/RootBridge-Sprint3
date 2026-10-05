@@ -1,18 +1,37 @@
-/*
-FILE: frontend/src/components/ErrorBoundary.jsx
-OWNER: Member 5 - Quality, docs and deployment
+import { Component } from "react";
 
-WHAT THIS FILE DOES
-Catches a crash while drawing and shows a friendly screen.
+// If any page throws while drawing, show a friendly message instead of a
+// blank white screen. React needs a class component for this.
+export default class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { crashed: false };
+  }
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+  static getDerivedStateFromError() {
+    return { crashed: true };
+  }
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+  componentDidCatch(error, info) {
+    // In a bigger product this would go to an error service.
+    console.error("A page crashed:", error, info?.componentStack);
+  }
+
+  render() {
+    if (!this.state.crashed) return this.props.children;
+    return (
+      <div className="crash-screen" role="alert">
+        <h1>Something went wrong on this page</h1>
+        <p>Your progress is saved. Try going back to the start.</p>
+        <div className="crash-actions">
+          <button type="button" className="btn btn-dark" onClick={() => window.location.assign("/")}>
+            Go to the home page
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={() => window.location.reload()}>
+            Reload this page
+          </button>
+        </div>
+      </div>
+    );
+  }
+}

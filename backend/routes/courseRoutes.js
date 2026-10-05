@@ -1,10 +1,6 @@
+// Course routes. Mounted at /api. Learners only.
 const express = require("express");
-const {
-  getTracks,
-  getTrackById,
-  getModuleById,
-  getLessonById,
-} = require("../controllers/courseController");
+const { getTracks, getTrackById, getModuleById, getLessonById } = require("../controllers/courseController");
 const { protect, requireRole } = require("../middleware/auth");
 const { LEARNER_ROLES } = require("../config/roles");
 

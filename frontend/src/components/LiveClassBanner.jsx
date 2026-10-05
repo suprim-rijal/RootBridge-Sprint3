@@ -1,18 +1,42 @@
-/*
-FILE: frontend/src/components/LiveClassBanner.jsx
-OWNER: Member 3 - Classes and teachers
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Video } from "lucide-react";
+import { myClasses } from "../services/api.js";
 
-WHAT THIS FILE DOES
-A slim banner on the dashboard when a class has a live link.
+// A slim banner on the dashboard when one of the learner's classes has a
+// live lesson link. (A banner, not a widget: the dashboard keeps its five
+// widgets.) Nothing is shown when there is no live link.
+export default function LiveClassBanner() {
+  const [live, setLive] = useState([]);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+  useEffect(() => {
+    let alive = true;
+    myClasses()
+      .then((res) => alive && setLive(res.data.filter((c) => c.liveClassUrl)))
+      .catch(() => {}); // the banner is optional: never break the dashboard
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+  if (!live.length) return null;
+  return (
+    <div className="live-banner" role="region" aria-label="Live classes">
+      {live.map((c) => (
+        <div key={c.id} className="live-banner-row">
+          <Video size={18} aria-hidden="true" />
+          <span>
+            <b>{c.name}</b>
+            {c.meets ? ` · ${c.meets}` : ""}
+          </span>
+          <a className="btn btn-green btn-sm" href={c.liveClassUrl} target="_blank" rel="noopener noreferrer">
+            Join live class
+          </a>
+        </div>
+      ))}
+      <Link to="/classes" className="live-banner-more">
+        Homework and materials
+      </Link>
+    </div>
+  );
+}

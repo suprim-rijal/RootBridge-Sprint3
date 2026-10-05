@@ -1,18 +1,20 @@
-/*
-FILE: frontend/src/components/TrackOff.jsx
-OWNER: Member 5 - Quality, docs and deployment
+import { Link } from "react-router-dom";
+import { Lock } from "lucide-react";
 
-WHAT THIS FILE DOES
-Shown when a parent has switched a track off.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+// Shown when a parent has turned a learning path off.
+export default function TrackOff({ title }) {
+  return (
+    <div className="ln-page-narrow ln-center">
+      <div className="ln-card" style={{ marginTop: 24 }}>
+        <Lock size={28} aria-hidden="true" />
+        <h1 className="ln-h2">{title} is turned off</h1>
+        <p className="ln-sub">A parent turned this path off in Parental Controls.</p>
+        <p style={{ marginTop: 18 }}>
+          <Link to="/dashboard" className="btn btn-primary btn-sm">
+            Back to my dashboard
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -1,18 +1,33 @@
-/*
-FILE: frontend/src/pages/dashboard/widgets/WordOfTheDay.jsx
-OWNER: Member 5 - Quality, docs and deployment
+import { Volume2 } from "lucide-react";
+import { htmlLangOf, speechLangOf } from "../../../data/curriculum.js";
+import { wordOfTheDay } from "../../../lib/learningSummary.js";
+import { speakWord } from "../../../lib/speech.js";
 
-WHAT THIS FILE DOES
-One dashboard card. It receives what it needs as props or reads it from progress, and draws a small piece of the dashboard.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+// Widget 3: one Nepali word a day (from the language curriculum).
+export default function WordOfTheDay() {
+  const word = wordOfTheDay();
+  return (
+    <section className="widget widget-word" aria-labelledby="w-word">
+      <h2 id="w-word" className="widget-title">
+        Word of the day
+      </h2>
+      <div className="word-row">
+        <span className="word-np" lang={htmlLangOf()}>
+          {word.np}
+        </span>
+        <button
+          type="button"
+          className="icon-btn"
+          onClick={() =>
+            speakWord(word.np, { lang: speechLangOf(), englishFallback: `${word.rom}. It means ${word.en}.` })
+          }
+          aria-label={`Hear ${word.rom}`}
+        >
+          <Volume2 size={18} />
+        </button>
+      </div>
+      <p className="word-rom">{word.rom}</p>
+      <p className="word-en">“{word.en}”</p>
+    </section>
+  );
+}

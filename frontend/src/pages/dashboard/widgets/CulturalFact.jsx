@@ -1,18 +1,17 @@
-/*
-FILE: frontend/src/pages/dashboard/widgets/CulturalFact.jsx
-OWNER: Member 5 - Quality, docs and deployment
+import { Landmark } from "lucide-react";
+import { factOfTheDay } from "../../../lib/learningSummary.js";
 
-WHAT THIS FILE DOES
-One dashboard card. It receives what it needs as props or reads it from progress, and draws a small piece of the dashboard.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+// Widget 4: a new culture fact every day.
+export default function CulturalFact() {
+  const fact = factOfTheDay();
+  return (
+    <section className="widget widget-fact" aria-labelledby="w-fact">
+      <h2 id="w-fact" className="widget-title">
+        <Landmark size={16} aria-hidden="true" /> Cultural fact
+      </h2>
+      <p className="fact-title">{fact.title}</p>
+      <p className="fact-text">{fact.text}</p>
+      <p className="widget-muted">A new fact every day.</p>
+    </section>
+  );
+}

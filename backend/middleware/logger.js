@@ -1,18 +1,12 @@
-/*
-FILE: backend/middleware/logger.js
-OWNER: Member 5 - Quality, docs and deployment
+// Prints one line per request, for example:
+// [2026-09-15T10:00:00.000Z] GET /api/tracks -> 200 (4 ms)
+function logger(req, res, next) {
+  const started = Date.now();
+  res.on("finish", () => {
+    const ms = Date.now() - started;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} -> ${res.statusCode} (${ms} ms)`);
+  });
+  next();
+}
 
-WHAT THIS FILE DOES
-One readable line per request.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = logger;

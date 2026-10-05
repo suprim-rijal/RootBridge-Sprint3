@@ -1,18 +1,16 @@
-/*
-FILE: frontend/src/main.jsx
-OWNER: Member 5 - Quality, docs and deployment
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css"; // Elearn base theme (colours, fonts, buttons, navbar, footer)
+import "./App.css"; // Learning-world styles built on the same Elearn variables
+import "./styles/flow.css"; // Auth, onboarding, dashboards, passport
+import "./styles/sprint3.css"; // Sprint 3: hearts, new exercise styles, explanations
+import App from "./App.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 
-WHAT THIS FILE DOES
-The very first file the browser runs: it attaches React to the page.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </StrictMode>,
+);

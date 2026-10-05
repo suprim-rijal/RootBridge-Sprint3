@@ -1,18 +1,16 @@
-/*
-FILE: backend/models/Assignment.js
-OWNER: Member 3 - Classes and teachers
+// Homework a teacher posts to one class.
+const mongoose = require("mongoose");
 
-WHAT THIS FILE DOES
-Homework a teacher posts to one class.
+const assignmentSchema = new mongoose.Schema(
+  {
+    group: { type: mongoose.Schema.Types.ObjectId, ref: "Group", required: true, index: true },
+    title: { type: String, required: [true, "Give the assignment a title."], trim: true, maxlength: 120 },
+    instructions: { type: String, default: "", maxlength: 2000 },
+    dueDate: { type: Date, default: null },
+    // Optional: lessons to do, e.g. ["l1-1-l1", "l1-1-l2"]
+    lessonIds: { type: [String], default: [] },
+  },
+  { timestamps: true },
+);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = mongoose.model("Assignment", assignmentSchema);

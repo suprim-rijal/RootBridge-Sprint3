@@ -1,18 +1,46 @@
-/*
-FILE: frontend/src/components/Layouts.jsx
-OWNER: Member 5 - Quality, docs and deployment
+import { Link, Outlet } from "react-router-dom";
+import Navbar from "./Navbar.jsx";
+import Footer from "./Footer.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
-WHAT THIS FILE DOES
-Page frames.
+// MainLayout: normal pages (Navbar + page + Footer).
+export function MainLayout() {
+  return (
+    <>
+      <Navbar />
+      <div className="navbar-spacer"></div>
+      <main className="main-content" id="main">
+        <Outlet />
+      </main>
+      <Footer />
+    </>
+  );
+}
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+// FocusLayout: onboarding + welcome. Only the logo and a log-out link,
+// so new users are not pulled away before they finish.
+export function FocusLayout() {
+  const { logout } = useAuth();
+  return (
+    <div className="focus-layout">
+      <header className="focus-header">
+        <Link to="/" className="logo">
+          <svg className="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+            <path
+              d="M20 4c-7 0-11 5-11 11 0 5 3 8 7 9.5-1 3-4 4.5-7 4.2v3.3c6 .6 11-2.3 12.5-7.5 3.7-1 6.5-4.4 6.5-9C28 9 24.5 4 20 4z"
+              fill="#E2A130"
+            />
+            <circle cx="24" cy="12" r="2.4" fill="#241A12" />
+          </svg>
+          <span>RootBridge</span>
+        </Link>
+        <button type="button" className="link-btn" onClick={logout}>
+          Log out
+        </button>
+      </header>
+      <main id="main">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
