@@ -174,21 +174,6 @@ export default function AuthPage({ mode }) {
           </button>
         </form>
 
-        {isLogin ? (
-          <div className="demo-box">
-            <p>
-              <b>Sprint 2 demo accounts.</b> Passwords are not checked yet.
-            </p>
-            <div className="demo-grid">
-              {DEMO_ACCOUNTS.map((d) => (
-                <button key={d.email} type="button" className="demo-account" onClick={() => fillDemo(d)}>
-                  <b>{d.label}</b>
-                  <span>{d.email}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : null}
       </section>
     </div>
   );
