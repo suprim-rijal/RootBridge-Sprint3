@@ -1,18 +1,19 @@
-/*
-FILE: backend/services/contentIndex.js
-OWNER: Member 4 - Content and languages
+const Module = require("../models/Module");
 
-WHAT THIS FILE DOES
-Holds every real lesson and module id in memory so claimed progress can be checked.
+let lessonIds = new Set();
+let moduleIds = new Set();
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+async function loadContentIndex() {
+  const modules = await Module.find().select("id lessons.id").lean();
+  moduleIds = new Set(modules.map((m) => m.id));
+  lessonIds = new Set(modules.flatMap((m) => m.lessons.map((l) => l.id)));
+  return { modules: moduleIds.size, lessons: lessonIds.size };
+}
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+const isLesson = (id) => lessonIds.has(id);
+const isModule = (id) => moduleIds.has(id);
+// Before the first load (or an empty database) nothing is known: allow
+// through rather than block learning, but say so.
+const isReady = () => lessonIds.size > 0;
+
+module.exports = { loadContentIndex, isLesson, isModule, isReady };
