@@ -1,18 +1,14 @@
-"""
-FILE: tests-e2e/fake_gemini.py
-OWNER: Member 5 - Quality, docs and deployment
-
-WHAT THIS FILE DOES
-An automated test file. It starts the app on a random port, talks to a real test database, and checks one area of behaviour end to end.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-"""
+# A fake Gemini for the browser test: always answers with one coach verdict.
+import json
+from http.server import BaseHTTPRequestHandler, HTTPServer
+ANSWER = {"verdict": "needs_work", "score": 41, "matchedSounds": ["m", "e", "r", "o"],
+          "mismatchedSounds": ["the word नाम (nām) was missing"],
+          "feedback": "You said the first word well, but “nām” was missing. Say it slowly: me-ro NĀM ... ho.",
+          "encouragement": "Nice clear start!"}
+class H(BaseHTTPRequestHandler):
+    def do_POST(self):
+        self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        body = json.dumps({"candidates": [{"content": {"parts": [{"text": json.dumps(ANSWER)}]}}]}).encode()
+        self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers(); self.wfile.write(body)
+    def log_message(self, *a): pass
+HTTPServer(("127.0.0.1", 5099), H).serve_forever()

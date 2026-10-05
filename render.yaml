@@ -1,0 +1,24 @@
+# Render Blueprint: ONE web service that runs the API and serves the website.
+# In Render: New > Blueprint > pick this repository. Then fill in the values
+# marked "sync: false" (Render asks for them).
+services:
+  - type: web
+    name: rootbridge
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"
+      - key: MONGODB_URI
+        sync: false # your MongoDB Atlas connection string (with /rootbridge before the ?)
+      - key: JWT_SECRET
+        generateValue: true # Render creates a long random secret for you
+      - key: CLIENT_ORIGIN
+        sync: false # your Render address, e.g. https://rootbridge.onrender.com
+      - key: GEMINI_API_KEY
+        sync: false # optional: strict AI pronunciation coach

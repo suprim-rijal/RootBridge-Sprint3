@@ -1,0 +1,4056 @@
+{
+  "info": {
+    "name": "RootBridge Sprint 3 API",
+    "description": "Start the backend (npm run dev) after npm run seed. Run the folders top to bottom: the login requests save tokens for the later requests.\n\nDemo accounts (password demo123): family@demo.com (Child/Parent), learner@demo.com (Normal), teacher@demo.com (Teacher).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "familyToken",
+      "value": ""
+    },
+    {
+      "key": "teacherToken",
+      "value": ""
+    },
+    {
+      "key": "garbageToken",
+      "value": "not.a.real.token"
+    },
+    {
+      "key": "classId",
+      "value": ""
+    },
+    {
+      "key": "classCode",
+      "value": ""
+    },
+    {
+      "key": "dirClassId",
+      "value": ""
+    },
+    {
+      "key": "requestId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('database connected', () => pm.expect(pm.response.json().database).to.eql('connected'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Auth (bcrypt + JWT)",
+      "item": [
+        {
+          "name": "Login Normal (saves token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"learner@demo.com\",\n  \"password\": \"demo123\",\n  \"role\": \"NormalUser\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const b = pm.response.json(); if (b.token) pm.collectionVariables.set('token', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Child/Parent (saves familyToken)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"family@demo.com\",\n  \"password\": \"demo123\",\n  \"role\": \"CombinedChildParent\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const b = pm.response.json(); if (b.token) pm.collectionVariables.set('familyToken', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Teacher (saves teacherToken)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"teacher@demo.com\",\n  \"password\": \"demo123\",\n  \"role\": \"Teacher\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const b = pm.response.json(); if (b.token) pm.collectionVariables.set('teacherToken', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login: wrong password (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Sprint 2 accepted any password. Sprint 3 must refuse it.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"learner@demo.com\",\n  \"password\": \"wrong-password\",\n  \"role\": \"NormalUser\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login: wrong role (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"learner@demo.com\",\n  \"password\": \"demo123\",\n  \"role\": \"Teacher\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login: missing role (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"learner@demo.com\",\n  \"password\": \"demo123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Signup Normal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Learner\",\n  \"email\": \"test.{{$timestamp}}@example.com\",\n  \"password\": \"secret1\",\n  \"role\": \"NormalUser\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('password never returned', () => pm.expect(pm.response.json().user.password).to.be.undefined);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Signup Child/Parent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maya Rai\",\n  \"childName\": \"Nima\",\n  \"email\": \"family.{{$timestamp}}@example.com\",\n  \"password\": \"secret1\",\n  \"role\": \"CombinedChildParent\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Signup: Admin role no longer exists (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"email\": \"adm.{{$timestamp}}@example.com\",\n  \"password\": \"secret1\",\n  \"role\": \"Admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Signup: duplicate email (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Copy\",\n  \"email\": \"learner@demo.com\",\n  \"password\": \"secret1\",\n  \"role\": \"NormalUser\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', () => pm.response.to.have.status(409));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me (session from token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('is the demo learner', () => pm.expect(pm.response.json().user.email).to.eql('learner@demo.com'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me without a token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me with a garbage token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{garbageToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forgot password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"learner@demo.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Users + parent PIN",
+      "item": [
+        {
+          "name": "Change my name",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Priya T.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Change it back",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Priya Thapa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Parent settings with a PIN (family)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"details\": {\n    \"parentSettings\": {\n      \"childName\": \"Aarav\",\n      \"dailyMinutes\": 20,\n      \"weeklyGoalDays\": 4,\n      \"allowedTracks\": {\n        \"language\": true,\n        \"culture\": true\n      },\n      \"allowSpeaking\": true,\n      \"requirePin\": true,\n      \"pin\": \"1234\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const s = pm.response.json().user.details.parentSettings;",
+                  "pm.test('only hasPin comes back', () => { pm.expect(s.hasPin).to.eql(true); pm.expect(s.pin).to.be.undefined; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify PIN: wrong (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/verify-pin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "verify-pin"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pin\": \"0000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify PIN: right",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/verify-pin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "verify-pin"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pin\": \"1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify PIN as a Normal user (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/verify-pin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "verify-pin"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pin\": \"1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forgotten PIN: wrong account password (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/pin/reset",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "pin",
+                "reset"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"not-the-password\",\n  \"newPin\": \"5555\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forgotten PIN: set a new one with the account password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/pin/reset",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "pin",
+                "reset"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"demo123\",\n  \"newPin\": \"5555\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('a PIN is set', () => pm.expect(pm.response.json().user.details.parentSettings.hasPin).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "The new PIN works",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/verify-pin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "verify-pin"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pin\": \"5555\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove the PIN completely",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/pin/reset",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "pin",
+                "reset"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"demo123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const s = pm.response.json().user.details.parentSettings;",
+                  "pm.test('no PIN, no lock', () => { pm.expect(s.hasPin).to.eql(false); pm.expect(s.requirePin).to.eql(false); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Courses",
+      "item": [
+        {
+          "name": "Tracks (Nepali)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tracks?language=nepali",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracks"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "nepali"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const t = pm.response.json().data;",
+                  "pm.test('all 368 Nepali lessons', () => pm.expect(t.reduce((s, x) => s + x.totalLessons, 0)).to.eql(368));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "One track",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tracks/nepali-language",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracks",
+                "nepali-language"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "One module",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/modules/l1-1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "modules",
+                "l1-1"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "One lesson",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/l1-1-l1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lessons",
+                "l1-1-l1"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Missing lesson (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/nope",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lessons",
+                "nope"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tracks without a token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tracks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracks"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tracks as a Teacher (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tracks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracks"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Progress + lives (NormalUser)",
+      "item": [
+        {
+          "name": "My progress (7 lives to start)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/progress/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('lives are on', () => pm.expect(pm.response.json().data.livesInfo.enabled).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sync progress from the browser",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"completedLessons\": [\n    \"l1-1-l1\"\n  ],\n  \"rhythmDays\": [\n    \"2026-09-21\"\n  ],\n  \"xp\": 20,\n  \"lastLesson\": {\n    \"trackId\": \"language\",\n    \"lessonId\": \"l1-1-l1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('lesson merged', () => pm.expect(pm.response.json().data.completedLessons).to.include('l1-1-l1'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Made-up lessons are ignored",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"completedLessons\": [\n    \"not-a-lesson\",\n    \"l9-9-l9\"\n  ],\n  \"masteredModules\": [\n    \"nope\"\n  ],\n  \"xp\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const d = pm.response.json().data;",
+                  "pm.test('invented lessons are not stored', () => pm.expect(d.completedLessons).to.not.include('not-a-lesson'));",
+                  "pm.test('XP is worked out by the server', () => pm.expect(d.xp).to.be.at.most(d.completedLessons.length * 20 + d.masteredModules.length * 100));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Class membership cannot be faked",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"details\": {\n    \"classes\": [\n      {\n        \"code\": \"999999\",\n        \"name\": \"Fake class\",\n        \"teacher\": \"Nobody\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('classes unchanged', () => pm.expect(pm.response.json().user.details.classes.length).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A photo must be a real image (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"details\": {\n    \"avatar\": \"not-an-image\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "The browser cannot set lives",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lives\": 99\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('lives unchanged', () => pm.expect(pm.response.json().data.livesInfo.lives).to.be.at.most(7));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wrong answer: lose a heart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/lives/lose",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "lives",
+                "lose"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"wrong\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hint: lose a heart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/lives/lose",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "lives",
+                "lose"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"hint\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown reason (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/lives/lose",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "lives",
+                "lose"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"cheat\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Review of a lesson you have not finished (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/lives/earn",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "lives",
+                "earn"
+              ]
+            },
+            "description": "A heart can only be earned by practising a lesson you already finished.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lessonId\": \"l2-1-l1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finish the module quest: refill to 7",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"masteredModules\": [\n    \"l1-1\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('7 hearts', () => pm.expect(pm.response.json().data.livesInfo.lives).to.eql(7));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lose one, then earn it back with a review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/lives/lose",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "lives",
+                "lose"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"wrong\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Review a finished lesson: +1 heart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/lives/earn",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "lives",
+                "earn"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lessonId\": \"l1-1-l1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('back to 7', () => pm.expect(pm.response.json().data.livesInfo.lives).to.eql(7));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Child/Parent: no lives (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/lives/lose",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "lives",
+                "lose"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"wrong\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: no learner progress (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/progress/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "progress",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Pronunciation grading",
+      "item": [
+        {
+          "name": "Correct word: spot_on",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pronunciation/grade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pronunciation",
+                "grade"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"nepali\",\n  \"targetNative\": \"नमस्ते\",\n  \"targetRomanization\": \"namaste\",\n  \"targetMeaning\": \"hello\",\n  \"transcripts\": [\n    {\n      \"text\": \"नमस्ते\",\n      \"confidence\": 0.93\n    }\n  ],\n  \"attemptNumber\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('spot_on', () => pm.expect(pm.response.json().data.verdict).to.eql('spot_on'));",
+                  "pm.test('says where the grade came from', () => pm.expect(['coach','local']).to.include(pm.response.json().data.source));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A different word: needs_work",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pronunciation/grade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pronunciation",
+                "grade"
+              ]
+            },
+            "description": "With GEMINI_API_KEY set, the AI coach grades it; without it, the strict local check does.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"nepali\",\n  \"targetNative\": \"नमस्ते\",\n  \"targetRomanization\": \"namaste\",\n  \"targetMeaning\": \"hello\",\n  \"transcripts\": [\n    {\n      \"text\": \"नमस्कार\",\n      \"confidence\": 0.88\n    }\n  ],\n  \"attemptNumber\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('not spot_on', () => pm.expect(pm.response.json().data.verdict).to.not.eql('spot_on'));",
+                  "pm.test('has a tip', () => pm.expect(pm.response.json().data.feedback).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nothing heard: unclear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pronunciation/grade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pronunciation",
+                "grade"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"nepali\",\n  \"targetNative\": \"नमस्ते\",\n  \"transcripts\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('unclear', () => pm.expect(pm.response.json().data.verdict).to.eql('unclear'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown language (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pronunciation/grade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pronunciation",
+                "grade"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"klingon\",\n  \"targetNative\": \"x\",\n  \"transcripts\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher cannot use it (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pronunciation/grade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pronunciation",
+                "grade"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"nepali\",\n  \"targetNative\": \"x\",\n  \"transcripts\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Languages (Step 5)",
+      "item": [
+        {
+          "name": "Finnish tracks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tracks?language=finnish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracks"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "finnish"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const t = pm.response.json().data;",
+                  "pm.test('language + culture', () => pm.expect(t.map(x => x.id).sort()).to.eql(['finnish-culture','finnish-language']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Japanese language track",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tracks/japanese-language",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracks",
+                "japanese-language"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('3 chapters', () => pm.expect(pm.response.json().data.chapters.length).to.eql(3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Japanese module: long vowels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/modules/ja-l1-3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "modules",
+                "ja-l1-3"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Twi lesson",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/tw-l1-1-l1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lessons",
+                "tw-l1-1-l1"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pick a language (the Language Hub)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"details\": {\n    \"onboarding\": {\n      \"language\": \"japanese\",\n      \"completed\": true\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('saved', () => pm.expect(pm.response.json().user.details.onboarding.language).to.eql('japanese'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tracks now default to Japanese",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tracks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracks"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('japanese', () => pm.expect(pm.response.json().data[0].language).to.eql('japanese'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown language is refused (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"details\": {\n    \"onboarding\": {\n      \"language\": \"klingon\",\n      \"completed\": true\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Back to Nepali",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"details\": {\n    \"onboarding\": {\n      \"language\": \"nepali\",\n      \"completed\": true\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Classes (Step 6)",
+      "item": [
+        {
+          "name": "Teacher: create a class (saves classId + classCode)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Saturday Nepali\",\n  \"meets\": \"Saturdays, 10:00\",\n  \"language\": \"nepali\",\n  \"liveClassUrl\": \"https://zoom.us/j/123456789\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const d = pm.response.json().data;",
+                  "pm.collectionVariables.set('classId', d.id); pm.collectionVariables.set('classCode', d.code);",
+                  "pm.test('6-digit code', () => pm.expect(d.code).to.match(/^\\d{6}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: my classes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: unsafe live link refused (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"liveClassUrl\": \"javascript:alert(1)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: join with the code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{classCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('class in my account', () => pm.expect(pm.response.json().user.details.classes[0].code).to.eql(pm.collectionVariables.get('classCode')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: join again (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{classCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', () => pm.response.to.have.status(409));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: wrong code (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Child/Parent: join too",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "join"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{familyToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{classCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: post homework",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}",
+                "assignments"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Practise greetings\",\n  \"instructions\": \"Finish Namaste world.\",\n  \"dueDate\": \"2026-10-01\",\n  \"lessonIds\": [\n    \"l1-1-l1\",\n    \"l1-1-l2\",\n    \"l1-1-l3\",\n    \"l1-1-l4\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: share a link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}/materials",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}",
+                "materials"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Alphabet video\",\n  \"url\": \"https://example.com/alphabet\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: class with roster + progress",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('2 students', () => pm.expect(pm.response.json().data.students.length).to.eql(2));",
+                  "pm.test('family shows the child name', () => pm.expect(pm.response.json().data.students.map(s => s.name)).to.include('Aarav'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: my classes (live link, homework, materials)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "mine"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const c = pm.response.json().data[0];",
+                  "pm.test('live link', () => pm.expect(c.liveClassUrl).to.eql('https://zoom.us/j/123456789'));",
+                  "pm.test('homework', () => pm.expect(c.assignments.length).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner cannot create classes (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: leave",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/leave",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "leave"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{classCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: list the class in the directory",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"discoverable\": true,\n  \"about\": \"Beginner Nepali for children, Saturdays in Espoo.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: find classes without a code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/directory?language=nepali",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "directory"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "nepali"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const c = pm.response.json().data[0];",
+                  "pm.test('the class is listed', () => pm.expect(c.name).to.eql('Saturday Nepali'));",
+                  "pm.test('the join code is never listed', () => pm.expect(c.code).to.be.undefined);",
+                  "pm.collectionVariables.set('dirClassId', c.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: ask to join",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{dirClassId}}/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{dirClassId}}",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Hello, I am learning Nepali on my own and would like to join.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: ask twice (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{dirClassId}}/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{dirClassId}}",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"again\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', () => pm.response.to.have.status(409));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: my requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/requests/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "requests",
+                "mine"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('pending', () => pm.expect(pm.response.json().data[0].status).to.eql('pending'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: see the requests (saves requestId)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "const r = pm.response.json().data[0];",
+                  "pm.collectionVariables.set('requestId', r.id);",
+                  "pm.test('the learner message is there', () => pm.expect(r.message).to.contain('learning Nepali'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner cannot read requests (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}",
+                "requests"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: approve the request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}/requests/{{requestId}}/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}",
+                "requests",
+                "{{requestId}}",
+                "approve"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner: now in the class",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "mine"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));",
+                  "pm.test('one class', () => pm.expect(pm.response.json().data.length).to.be.at.least(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teacher: delete the class",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{classId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "{{classId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teacherToken}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Contact",
+      "item": [
+        {
+          "name": "Send a message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contact"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sita Sharma\",\n  \"email\": \"family@demo.com\",\n  \"subject\": \"Question\",\n  \"message\": \"When is the next live class?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 2xx', () => pm.response.to.be.success);",
+                  "pm.test('success is true', () => pm.expect(pm.response.json().success).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Missing message (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contact"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"email\": \"x@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

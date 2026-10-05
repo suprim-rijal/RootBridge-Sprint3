@@ -1,18 +1,56 @@
-"""
-FILE: tests-e2e/step10_forgot_pin_browser.py
-OWNER: Member 5 - Quality, docs and deployment
-
-WHAT THIS FILE DOES
-An automated test file. It starts the app on a random port, talks to a real test database, and checks one area of behaviour end to end.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-"""
+import asyncio, json, urllib.request
+from playwright.async_api import async_playwright
+B="http://localhost:4173"; API="http://localhost:5000/api"
+res=[]
+def ok(l,c): res.append(bool(c)); print(("PASS " if c else "FAIL ")+l)
+def api(m,p,b=None,t=None):
+    r=urllib.request.Request(API+p,method=m,data=json.dumps(b).encode() if b is not None else None)
+    r.add_header("Content-Type","application/json")
+    if t: r.add_header("Authorization","Bearer "+t)
+    try: return urllib.request.urlopen(r).status, json.loads(urllib.request.urlopen(r).read())
+    except urllib.error.HTTPError as e: return e.code, json.loads(e.read())
+async def main():
+    # a PIN nobody remembers (like a Postman run leaves behind)
+    t=api("POST","/auth/login",{"email":"family@demo.com","password":"demo123","role":"CombinedChildParent"})[1]["token"]
+    api("POST","/users/update",{"details":{"parentSettings":{"childName":"Aarav","requirePin":True,"pin":"1234"}}},t)
+    async with async_playwright() as p:
+        br=await p.chromium.launch(); pg=await br.new_page(viewport={"width":1200,"height":950})
+        errs=[]; pg.on("pageerror", lambda e: errs.append(str(e)))
+        await pg.goto(B+"/login"); await pg.wait_for_timeout(400)
+        await pg.select_option(".role-select", label="Child/Parent")
+        await pg.fill("input[type=email]","family@demo.com"); await pg.fill("input[type=password]","demo123")
+        await pg.click("button[type=submit]"); await pg.wait_for_timeout(1500)
+        # the switch asks for a PIN the parent does not know
+        await pg.locator(".view-switch").first.click(); await pg.wait_for_timeout(800)
+        ok("the PIN dialog opens", await pg.locator(".pin-dialog[open]").count()==1)
+        await pg.fill(".pin-input","0000"); await pg.click("text=Unlock"); await pg.wait_for_timeout(900)
+        ok("a wrong PIN says so", "not right" in await pg.inner_text(".pin-dialog"))
+        ok("'Forgot the PIN?' is offered", await pg.locator(".pin-dialog >> text=Forgot the PIN?").count()==1)
+        await pg.click(".pin-dialog >> text=Forgot the PIN?"); await pg.wait_for_timeout(400)
+        await pg.fill(".forgot-pin input[type=password]","wrong-password")
+        await pg.fill(".forgot-pin .pin-input","5555")
+        await pg.click("button:has-text('Set the new PIN')"); await pg.wait_for_timeout(900)
+        ok("a wrong account password is refused", "not your account password" in await pg.inner_text(".forgot-pin"))
+        await pg.fill(".forgot-pin input[type=password]","demo123")
+        await pg.click("button:has-text('Set the new PIN')"); await pg.wait_for_timeout(1200)
+        ok("the new PIN is confirmed", "new PIN is ready" in await pg.inner_text(".pin-dialog"))
+        await pg.screenshot(path="/tmp/forgot.png")
+        await pg.fill(".pin-input","5555"); await pg.click("text=Unlock"); await pg.wait_for_timeout(1200)
+        ok("the new PIN opens the parent view", pg.url.endswith("/parent"))
+        # and removing it entirely, from the unlock screen
+        await pg.evaluate("localStorage.clear()")
+        await pg.goto(B+"/login"); await pg.wait_for_timeout(400)
+        await pg.select_option(".role-select", label="Child/Parent")
+        await pg.fill("input[type=email]","family@demo.com"); await pg.fill("input[type=password]","demo123")
+        await pg.click("button[type=submit]"); await pg.wait_for_timeout(1500)
+        await pg.goto(B+"/parent"); await pg.wait_for_timeout(900)
+        ok("the unlock screen also offers it", await pg.locator(".unlock >> text=Forgot the PIN?").count()==1)
+        await pg.click(".unlock >> text=Forgot the PIN?"); await pg.wait_for_timeout(400)
+        await pg.fill(".forgot-pin input[type=password]","demo123")
+        await pg.click("button:has-text('Remove the PIN')"); await pg.wait_for_timeout(1200)
+        ok("the PIN can be removed", "removed" in await pg.inner_text(".unlock"))
+        await pg.click("button:has-text('Open parent view')"); await pg.wait_for_timeout(1000)
+        ok("the parent view then opens with no PIN", pg.url.endswith("/parent"))
+        print("errors:", errs or "none"); print(f"{sum(res)}/{len(res)} passed")
+        await br.close()
+asyncio.run(main())
