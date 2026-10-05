@@ -1,18 +1,31 @@
-/*
-FILE: backend/utils/lessonPayload.js
-OWNER: Member 4 - Content and languages
+// Turns a module's words into simple multiple-choice prompts.
+// Copied unchanged from Sprint 2 (mockApi.js / courseController.js), so
+// GET /api/lessons/:id returns exactly the same JSON as before.
+function buildLessonPayload(mod, lesson) {
+  const words = mod.items.slice(0, 4);
+  const prompts = words.map((word, i) => {
+    const others = mod.items.filter((x) => x.np !== word.np && x.en !== word.en);
+    const wrong = [...others.slice(i), ...others.slice(0, i)].slice(0, 2).map((x) => x.en);
+    const options = [...new Set([word.en, ...wrong])];
+    const shift = i % options.length;
+    const rotated = [...options.slice(shift), ...options.slice(0, shift)];
+    return {
+      question: `What does ${word.np} (${word.rom}) mean?`,
+      options: rotated,
+      correctAnswer: rotated.indexOf(word.en),
+    };
+  });
 
-WHAT THIS FILE DOES
-Turns a module's vocabulary into simple multiple-choice questions for the API.
+  const first = mod.items[0];
+  return {
+    id: lesson.id,
+    moduleId: mod.id,
+    title: lesson.title,
+    phase: lesson.phase,
+    minutes: lesson.minutes,
+    storyText: `${mod.title}: ${mod.goal}${first ? ` Today's first word is ${first.np} (${first.rom}), which means "${first.en}".` : ""}`,
+    prompts,
+  };
+}
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = { buildLessonPayload };
