@@ -4,7 +4,7 @@
   "version": "3.0.0",
   "description": "RootBridge: heritage language and culture learning (React + Express + MongoDB).",
   "scripts": {
-    "build": "npm --prefix frontend ci && npm --prefix frontend run build && npm --prefix backend ci --omit=dev",
+    "build": "NODE_ENV=development npm --prefix frontend ci && npm --prefix frontend run build && npm --prefix backend ci --omit=dev",
     "start": "node backend/server.js",
     "seed": "npm --prefix backend run seed",
     "test": "npm --prefix backend test"
