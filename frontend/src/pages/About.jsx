@@ -14,7 +14,7 @@ export default function About() {
         <h2>Our Mission</h2>
         <p>
           For families growing up away from their countries of origin, culture
-          and language are more than items on a page—they are lines of
+          and language are more than items on a page, they are lines of
           connection to grandparents, cousins, and ancestral history. RootBridge
           was created to make heritage language learning engaging, interactive,
           and personalized, allowing children to learn comfortably at their own
@@ -86,7 +86,7 @@ export default function About() {
       <div className="about-section">
         <h2>Active Support</h2>
         <p>
-          RootBridge provides lessons in Twi (Ghana), Yoruba (Nigeria), and
+          RootBridge provides lessons in Twi (Ghana), Finnish, Japanese, and
           Nepali. Additional languages are currently in active design,
           prioritizing high-immersion cultural passbooks.
         </p>
