@@ -2,6 +2,8 @@ import { useState } from "react";
 import { LANGUAGES } from "../data/languages.js";
 import { Link } from "react-router-dom";
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [newsMsg, setNewsMsg] = useState("");
@@ -99,7 +101,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <div>© {new Date().getFullYear()} RootBridge. All rights reserved.</div>
+        <div>© {CURRENT_YEAR} RootBridge. All rights reserved.</div>
         <div style={{ display: "flex", gap: "20px" }}>
           <span>Privacy Policy</span>
           <span>Terms of Use</span>
