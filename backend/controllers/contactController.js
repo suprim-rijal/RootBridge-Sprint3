@@ -1,18 +1,24 @@
-/*
-FILE: backend/controllers/contactController.js
-OWNER: Member 5 - Quality, docs and deployment
+// POST /api/contact — a message from the public contact form, saved in MongoDB.
+// (There is no admin page in Sprint 3; messages can be read in MongoDB Atlas.)
+const Message = require("../models/Message");
+const asyncHandler = require("../utils/asyncHandler");
+const AppError = require("../utils/AppError");
 
-WHAT THIS FILE DOES
-The public contact form, and a way to read what it collects.
+const createMessage = asyncHandler(async (req, res) => {
+  const { name, email, subject, message } = req.body || {};
+  const saved = await Message.create({ name, email, subject: subject || "General Query", message });
+  res.status(201).json({ success: true, message: "Message stored successfully", contact: saved });
+});
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+// GET /api/contact/messages
+// secret instead: set SUPPORT_TOKEN in .env and send it as the
+// "x-support-token" header. Without the setting, the route is switched off.
+const listMessages = asyncHandler(async (req, res) => {
+  const { env } = require("../config/env");
+  if (!env.supportToken) throw new AppError("Reading messages is switched off. Set SUPPORT_TOKEN in .env.", 404);
+  if (req.headers["x-support-token"] !== env.supportToken) throw new AppError("Wrong support token.", 401);
+  const messages = await Message.find().sort({ createdAt: -1 }).limit(200).lean();
+  res.json({ success: true, count: messages.length, data: messages });
+});
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = { createMessage, listMessages };

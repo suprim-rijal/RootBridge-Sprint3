@@ -1,18 +1,18 @@
-/*
-FILE: backend/models/Material.js
-OWNER: Member 3 - Classes and teachers
+// A file or link a teacher shares with one class.
+const mongoose = require("mongoose");
 
-WHAT THIS FILE DOES
-A file or a link shared with a class.
+const materialSchema = new mongoose.Schema(
+  {
+    group: { type: mongoose.Schema.Types.ObjectId, ref: "Group", required: true, index: true },
+    title: { type: String, required: [true, "Give the material a title."], trim: true, maxlength: 120 },
+    kind: { type: String, enum: ["file", "link"], required: true },
+    url: { type: String, default: "" }, // for links
+    fileId: { type: mongoose.Schema.Types.ObjectId, default: null, select: false },
+    fileName: { type: String, default: "" },
+    mimeType: { type: String, default: "" },
+    size: { type: Number, default: 0 },
+  },
+  { timestamps: true },
+);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = mongoose.model("Material", materialSchema);

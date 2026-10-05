@@ -1,18 +1,14 @@
-/*
-FILE: backend/models/Message.js
-OWNER: Member 5 - Quality, docs and deployment
+// A message from the public contact form.
+const mongoose = require("mongoose");
 
-WHAT THIS FILE DOES
-A message from the public contact form.
+const messageSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: [true, "Enter your name."], trim: true, maxlength: 80 },
+    email: { type: String, required: [true, "Enter your email."], trim: true, lowercase: true },
+    subject: { type: String, default: "General Query", maxlength: 120 },
+    message: { type: String, required: [true, "Write a message."], maxlength: 3000 },
+  },
+  { timestamps: true },
+);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = mongoose.model("Message", messageSchema);

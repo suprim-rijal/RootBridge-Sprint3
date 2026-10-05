@@ -1,13 +1,3 @@
-// =====================================================================
-// Progress — the server copy of what frontend/src/lib/progress.js keeps
-// in the browser. One document per user.
-//
-// The browser stays "first" (instant, works offline) and sends its
-// progress here in the background. Having it on the server means:
-//   * progress follows the learner to another device
-//   * a teacher can see a student's progress (Step 6)
-//   * lives can be trusted: only the server changes them
-// =====================================================================
 const mongoose = require("mongoose");
 
 const MAX_LIVES = 7;

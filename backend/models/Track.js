@@ -1,18 +1,18 @@
-/*
-FILE: backend/models/Track.js
-OWNER: Member 4 - Content and languages
+// A learning path, e.g. "nepali-language" or "finnish-culture".
+const mongoose = require("mongoose");
 
-WHAT THIS FILE DOES
-One learning path, such as 'nepali-language' or 'finnish-culture'.
+const trackSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true, unique: true }, // "{language}-{kind}"
+    language: { type: String, required: true, index: true }, // "nepali"
+    kind: { type: String, enum: ["language", "culture"], required: true },
+    title: { type: String, required: true },
+    nativeTitle: { type: String, default: "" },
+    description: { type: String, default: "" },
+    themeColor: { type: String, default: "#332B5C" },
+    order: { type: Number, default: 0 },
+  },
+  { timestamps: true },
+);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = mongoose.model("Track", trackSchema);
