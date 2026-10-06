@@ -1,18 +1,17 @@
-/*
-FILE: backend/models/Chapter.js
-OWNER: Member 4 - Content and languages
+// A chapter inside a track, e.g. "L1 First sounds and social language".
+const mongoose = require("mongoose");
 
-WHAT THIS FILE DOES
-A chapter inside a track, for example 'L1 Hello and first sounds'.
+const chapterSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true, unique: true }, // "l1", "fi-l1"
+    trackId: { type: String, required: true, index: true },
+    code: { type: String, required: true },
+    title: { type: String, required: true },
+    nativeTitle: { type: String, default: "" },
+    summary: { type: String, default: "" },
+    order: { type: Number, default: 0 },
+  },
+  { timestamps: true },
+);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+module.exports = mongoose.model("Chapter", chapterSchema);
