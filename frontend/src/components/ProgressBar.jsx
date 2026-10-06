@@ -1,18 +1,17 @@
-/*
-FILE: frontend/src/components/ProgressBar.jsx
-OWNER: Member 5 - Quality, docs and deployment
-
-WHAT THIS FILE DOES
-A labelled progress bar.
-
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
-
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+// Horizontal progress bar using Elearn's .progress-track / .progress-fill.
+// The fill colour follows the track colour (--track) of the parent element.
+export default function ProgressBar({ value = 0, label }) {
+  const pct = Math.max(0, Math.min(100, value));
+  return (
+    <div
+      className="progress-track ln-progress"
+      role="progressbar"
+      aria-valuenow={Math.round(pct)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={label}
+    >
+      <div className="progress-fill" style={{ width: `${pct}%` }} />
+    </div>
+  );
+}

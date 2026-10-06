@@ -1,18 +1,37 @@
-/*
-FILE: backend/routes/groupRoutes.js
-OWNER: Member 3 - Classes and teachers
+// Class routes. Mounted at /api/groups. Everything needs a login.
+const express = require("express");
+const ctrl = require("../controllers/groupController");
+const { protect, requireRole } = require("../middleware/auth");
+const { upload } = require("../middleware/upload");
+const { ROLES, LEARNER_ROLES } = require("../config/roles");
 
-WHAT THIS FILE DOES
-All class routes, for both sides.
+const router = express.Router();
+router.use(protect);
 
-BEFORE YOU WRITE ANY CODE HERE
-  1. Read this file's chapter in docs/RootBridge-Course-Book.pdf.
-  2. Check OWNERSHIP.md - if you are not the owner, open an issue instead
-     of editing, or agree a hand-over in the group chat first.
-  3. Create a branch named   feature/<area>-<short-task>   from develop.
+const teacher = requireRole(ROLES.TEACHER);
+const learner = requireRole(...LEARNER_ROLES);
 
-WHEN YOU HAVE FINISHED
-  - Run the checks for your side (backend: npm test, frontend: npm run build).
-  - Commit in small steps with messages that say WHY, not just what.
-  - Open a pull request into develop and ask one teammate to review.
-*/
+// Learners (these come first so "join" is not read as a class id)
+router.get("/directory", learner, ctrl.directory); // classes open to requests
+router.get("/requests/mine", learner, ctrl.myRequests);
+router.post("/:id/requests", learner, ctrl.askToJoin);
+router.post("/join", learner, ctrl.join);
+router.post("/leave", learner, ctrl.leave);
+router.get("/mine", learner, ctrl.myClasses);
+
+// Teachers
+router.post("/", teacher, ctrl.createGroup);
+router.get("/", teacher, ctrl.listMine);
+router.get("/:id", teacher, ctrl.getGroup);
+router.patch("/:id", teacher, ctrl.updateGroup);
+router.delete("/:id", teacher, ctrl.deleteGroup);
+router.delete("/:id/members/:userId", teacher, ctrl.removeMember);
+router.get("/:id/requests", teacher, ctrl.listRequests);
+router.post("/:id/requests/:rid/approve", teacher, ctrl.approveRequest);
+router.post("/:id/requests/:rid/decline", teacher, ctrl.declineRequest);
+router.post("/:id/assignments", teacher, ctrl.createAssignment);
+router.delete("/:id/assignments/:aid", teacher, ctrl.deleteAssignment);
+router.post("/:id/materials", teacher, upload.single("file"), ctrl.addMaterial);
+router.delete("/:id/materials/:mid", teacher, ctrl.deleteMaterial);
+
+module.exports = router;
