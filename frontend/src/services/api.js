@@ -58,8 +58,8 @@ async function withToken(promise) {
 }
 
 export const login = ({ email, password, role }) => withToken(post("/auth/login", { email, password, role }));
-export const signup = ({ name, childName, email, password, role }) =>
-  withToken(post("/auth/signup", { name, childName, email, password, role }));
+export const signup = ({ name, childName, email, password, role, teacherCode }) =>
+  withToken(post("/auth/signup", { name, childName, email, password, role, teacherCode }));
 export const me = () => get("/auth/me");
 export const logout = () => tokenStore.clear();
 export const requestPasswordReset = ({ email }) => post("/auth/forgot-password", { email });
